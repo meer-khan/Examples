@@ -10,7 +10,7 @@ from waitress import serve
 import pathlib
 from datetime import datetime
 import requests
-
+# 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
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})

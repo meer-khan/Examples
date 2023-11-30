@@ -11,6 +11,7 @@ import pathlib
 from datetime import datetime
 import requests
 # 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
+# organizationID: org-vO1XmiqVug26vPS20hBFcnrE
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})

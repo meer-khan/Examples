@@ -10,11 +10,56 @@ from waitress import serve
 import pathlib
 from datetime import datetime
 import requests
+import openai
 # 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
 # organizationID: org-vO1XmiqVug26vPS20hBFcnrE
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
+
+key = "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"
+openai.api_key = key
+
+
+response = openai.ChatCompletion.create(
+  model="gpt-4-1106-preview",
+  messages=[
+        {"role": "user", "content": ""},
+    ]
+)
+
+def update_chat(messages, role, content):
+    messages.append({"role": role, "content": content})
+    return messages
+
+
+def get_chatgpt_response(messages):
+  response = openai.ChatCompletion.create(
+  model="gpt-4-1106-preview",
+  messages=messages
+)
+  return  response['choices'][0]['message']['content']
+
+
+def print_last_message(messages):
+    if messages:
+        last_message = messages[-1]
+        print(last_message["role"] + ": " + last_message["content"])
+
+# Your existing code
+messages = [
+    {"role": "user", "content": "   "},
+    {"role": "assistant", "content": "   "},
+]
+
+# while True:
+print_last_message(messages)
+user_input = input()
+messages = update_chat(messages, "user", user_input)
+model_response = get_chatgpt_response(messages)
+messages = update_chat(messages, "assistant", model_response)
+
+
 
 
 @app.route('/prompt/',methods=['POST'])

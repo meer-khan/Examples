@@ -17,7 +17,7 @@ app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
 
-key = "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"
+key = "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"
 openai.api_key = key
 
 

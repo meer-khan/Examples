@@ -1,0 +1,73 @@
+.env explained:
+    >> Add API key in .env file variable "KEY" 
+    >> Add your domain in .env file variable "ORIGIN" 
+    >> "MODE" is in 'PROD' for production but you can set it to "DEV" for development
+
+WSGI server explained:
+    >> Waitress is used as WSGI Server (LICENSE: ZPL (permissive))
+
+Run Instruction: 
+    >> Create Python virutal environment (Instructions for creating Python virtual enviroment is given below)
+    >> Activate your python virtual environment 
+    >> Install packages from requirements.txt file using command 
+    >> Go into ChatGPT Directory in your command prompt or vscode terminal (where you activated virtual environment)
+    >> python app.py 
+
+
+How to Create Python Virtual Environment: 
+    >> python -m venv venv
+    >> venv\Scripts\activate (for windows)
+    >> source venv/bin/activate (for linux)
+
+
+API Documentation: 
+
+BASE URL: 
+    >> http://127.0.0.1:5000
+
+ENDPOINT: 
+    >> /prompt/
+
+METHOD: 
+    >> POST 
+
+REQUEST HEADERS: 
+    >> Content-Type: application/json
+
+BODY: 
+    {
+    "shop_categories": "Clothing",
+    "ccn": "Seasonal Discounts",
+    "seasonality": "Spring",
+    "ked": "Black Friday",
+    "iskd": "Fashion Week",
+    "shop_locations": "Online, New York"
+    }
+
+
+RESPONSE: 
+    >> Status code 200 , Success 
+    {
+    "response": "Generated email campaign calendar content."
+    }
+
+ERROR: 
+    >> Status Code: 500 
+    { "error": "An unexpected error occurred: Error details here." }
+
+
+EXAMPLE: 
+    curl -X POST -H "Content-Type: application/json" -d '{
+        "shop_categories": "Clothing",
+        "ccn": "Seasonal Discounts",
+        "seasonality": "Spring",
+        "ked": "Black Friday",
+        "iskd": "Fashion Week",
+        "shop_locations": "Online, New York"
+    }' http://127.0.0.1:5000/prompt/
+
+
+
+
+
+

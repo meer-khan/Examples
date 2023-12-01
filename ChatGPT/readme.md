@@ -66,7 +66,7 @@ To run the application, follow these steps:
 http://127.0.0.1:5000
 
 ### Endpoint
-
+/prompt/
 
 ### Method
 

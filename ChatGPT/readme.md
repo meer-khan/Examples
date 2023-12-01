@@ -1,4 +1,4 @@
-# ChatGPT Email Campaign Calendar Generator
+# ChatGPT Email Campaign Calendar Generator 🇵🇰
 
 ## .env Configuration
 
@@ -13,7 +13,7 @@ The `.env` file is used for configuration settings. Follow these steps to set up
 2. **Origin Configuration**: Set the variable `ORIGIN` to specify your domain. This is crucial for security considerations.
 
     ```env
-    ORIGIN=http://yourdomain.com
+    ORIGIN=http://yourdomain.com:port
     ```
 
 3. **Mode Selection**: The variable `MODE` determines the operating mode. Set it to `'PROD'` for production. For development purposes, set it to `"DEV"`.

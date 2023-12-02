@@ -54,7 +54,7 @@ To run the application, follow these steps:
     pip install -r requirements.txt
     ```
 
-3. **Run the Application**: Navigate to the `ChatGPT` directory in your command prompt or VSCode terminal (where you activated the virtual environment) and execute:
+3. **Run the Application**: Navigate to the `src` directory in your command prompt or VSCode terminal (where you activated the virtual environment) and execute:
 
     ```bash
     python app.py

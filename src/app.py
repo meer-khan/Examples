@@ -17,6 +17,12 @@ app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
 
+
+# .env 
+# ALLOWED_HOSTS=localhost,127.0.0.1
+# Get a list of values
+# allowed_hosts = config('ALLOWED_HOSTS', default='', cast=lambda v: [s.strip() for s in v.split(',')])
+
 key = config("KEY")
 openai.api_key = key
 
@@ -124,3 +130,6 @@ if __name__ == "__main__":
         app.run(host='localhost', debug=True, port=5000)
     if config("MODE") == 'PROD':
         serve(app, host = '0.0.0.0', port=5000, threads = 4)
+        
+
+# max_request_body_size = 2073741824

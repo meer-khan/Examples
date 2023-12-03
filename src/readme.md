@@ -1,4 +1,4 @@
-# ChatGPT Email Campaign Calendar Generator 🇵🇰
+# ChatGPT Email Campaign Calendar Generator
 
 ## .env Configuration
 
@@ -83,10 +83,10 @@ http://127.0.0.1:5000
 ```json
 {
     "shop_categories": "Clothing",
-    "ccn": "Seasonal Discounts",
+    "ccn": "Seasonal Discounts", //Content concept and narrative
     "seasonality": "Spring",
-    "ked": "Black Friday",
-    "iskd": "Fashion Week",
+    "ked": "Black Friday",  //Key E-commerce Dates
+    "iskd": "Fashion Week", //Industry-Specific Key Days
     "shop_locations": "Online, New York"
 }
 ```
@@ -113,10 +113,10 @@ Status Code: 500 Internal Server Error
 ```bash 
 curl -X POST -H "Content-Type: application/json" -d '{
     "shop_categories": "Clothing",
-    "ccn": "Seasonal Discounts",
+    "ccn": "Seasonal Discounts", 
     "seasonality": "Spring",
     "ked": "Black Friday",
-    "iskd": "Fashion Week",
+    "iskd": "Fashion Week", 
     "shop_locations": "Online, New York"
 }' http://127.0.0.1:5000/prompt/
 

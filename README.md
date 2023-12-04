@@ -68,6 +68,9 @@ http://127.0.0.1:5000
 ### Endpoint
 /prompt/
 
+### Complete URL
+http://127.0.0.1:5000/prompt/
+
 ### Method
 
 - **POST**

@@ -27,12 +27,12 @@ key = config("KEY")
 openai.api_key = key
 
 
-response = openai.ChatCompletion.create(
-  model="gpt-4-1106-preview",
-  messages=[
-        {"role": "user", "content": ""},
-    ]
-)
+# response = openai.ChatCompletion.create(
+#   model="gpt-4-1106-preview",
+#   messages=[
+#         {"role": "user", "content": ""},
+#     ]
+# )
 
 def update_chat(messages, role, content):
     messages.append({"role": role, "content": content})
@@ -106,6 +106,7 @@ def pom_extractor():
         around {seasionality}, 
         considering {key_e_commerce_dates} and {industry_specific_key_days}, targeted at {shop_locations}.'''
 
+        # ic(ques)
 
         messages = update_chat(messages, "user", ques)
         # ic(messages)

@@ -23,8 +23,8 @@ cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
 # Get a list of values
 # allowed_hosts = config('ALLOWED_HOSTS', default='', cast=lambda v: [s.strip() for s in v.split(',')])
 
-# key = config("KEY")
-# openai.api_key = key
+key = config("KEY")
+openai.api_key = key
 
 
 # response = openai.ChatCompletion.create(
@@ -34,28 +34,28 @@ cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
 #     ]
 # )
 
-# def update_chat(messages, role, content):
-#     messages.append({"role": role, "content": content})
-#     return messages
+def update_chat(messages, role, content):
+    messages.append({"role": role, "content": content})
+    return messages
 
 
-# def get_chatgpt_response(messages):
-#   response = openai.ChatCompletion.create(
-#   model="gpt-4-1106-preview",
-#   messages=messages
-# )
-#   return  response['choices'][0]['message']['content']
+def get_chatgpt_response(messages):
+  response = openai.ChatCompletion.create(
+  model="gpt-4-1106-preview",
+  messages=messages
+)
+  return  response['choices'][0]['message']['content']
 
 
-# def print_last_message(messages):
-#     if messages:
-#         last_message = messages[-1]
-#         print(last_message["role"] + ": " + last_message["content"])
+def print_last_message(messages):
+    if messages:
+        last_message = messages[-1]
+        print(last_message["role"] + ": " + last_message["content"])
 
-# def get_last_message(messages):
-#     if messages:
-#         last_message = messages[-1]
-#         return last_message["role"] + ": " + last_message["content"]
+def get_last_message(messages):
+    if messages:
+        last_message = messages[-1]
+        return last_message["role"] + ": " + last_message["content"]
 
 '''
 You are an email marketer for online [sneaker e-commerce store] , 
@@ -93,7 +93,8 @@ Islamabad Pakistan]
 
 '''
 
-
+def validator(sc=" ", ccn=" ", seas=" ", ked = " ", iskd= " ", sl= " "): 
+    pass
 
 
 
@@ -113,13 +114,31 @@ def pom_extractor():
         data = request.get_json()
         # ques = data.get("question","")
 
-        shop_categories = data.get("shop_categories", " ")
-        content_concept_n_narrative = data.get("ccn", " ")
-        seasionality = data.get("seasonality", " ")
-        key_e_commerce_dates = data.get("ked", " ")
-        industry_specific_key_days = data.get("iskd", " ")
-        shop_locations = data.get("shop_locations"," ")
+        shop_categories = data.get("shop_categories", "online store")
+        content_concept_n_narrative = data.get("ccn", "relevant to shop categories")
+        seasionality = data.get("seasonality", "current season")
+        key_e_commerce_dates = data.get("ked", "weekly calendar for next 3 months")
+        industry_specific_key_days = data.get("iskd", "relevant to shop categories")
+        shop_locations = data.get("shop_locations","online store")
 
+        if shop_categories == None: 
+            shop_categories = "online store"
+
+        if content_concept_n_narrative == None: 
+            content_concept_n_narrative = "relevant to shop categories"
+
+        if seasionality == None: 
+            seasionality = "current season"
+
+        if key_e_commerce_dates == None: 
+            key_e_commerce_dates = "weekly calendar for next 3 months"
+
+        if industry_specific_key_days == None: 
+            industry_specific_key_days = "relevant to shop categories"
+
+        if shop_locations == None: 
+            shop_locations = "online store"
+        
         # * OUR STRING FOR PROMPT ENGINEERING
         # ques = f'''Generate an email campaign calendar for {shop_categories} 
         # with a focus on {content_concept_n_narrative} 
@@ -138,6 +157,8 @@ def pom_extractor():
                 tailored according to seasonality, trends, shop category, what the shops products are, key e-commerce days, 
                 3 days a week at least. 
             '''
+        
+        ic (ques)
 # Please act like a strategist and implementor and generate relevant chatgpt prompt to get above results.
 # Please generate relevant chatgpt prompt to get above results.
         # ques = '''
@@ -161,9 +182,6 @@ def pom_extractor():
 
         # *: END CODE
 
-
-
-
         messages = update_chat(messages, "user", ques)
         # ic(messages)
         model_response = get_chatgpt_response(messages)
@@ -182,38 +200,6 @@ def pom_extractor():
 
 
 if __name__ == "__main__":
-
-    key = config("KEY")
-    openai.api_key = key
-    response = openai.ChatCompletion.create(
-    model="gpt-4-1106-preview",
-    messages=[
-            {"role": "user", "content": ""},
-        ]
-    )
-
-    def update_chat(messages, role, content):
-        messages.append({"role": role, "content": content})
-        return messages
-
-
-    def get_chatgpt_response(messages):
-        response = openai.ChatCompletion.create(
-        model="gpt-4-1106-preview",
-        messages=messages
-        )
-        return  response['choices'][0]['message']['content']
-
-
-    def print_last_message(messages):
-        if messages:
-            last_message = messages[-1]
-            print(last_message["role"] + ": " + last_message["content"])
-
-    def get_last_message(messages):
-        if messages:
-            last_message = messages[-1]
-            return last_message["role"] + ": " + last_message["content"]
         
     if config("MODE") == 'DEV':
         app.run(host='localhost', debug=True, port=5000)

@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-
+from icecream import ic
 from datetime import datetime
 
 
@@ -55,7 +55,14 @@ def main():
     return cu,cs,cd
 
 
+def add_site(cs, user_id,  location):
+    inserted_record = cs.insert_one({"UserID": user_id, "Location": location })
+    return str(inserted_record.inserted_id)
+
+
 if __name__ == "__main__": 
     client = MongoClient("mongodb://localhost:27017/")
     cu,cs,cd = create_db(client)
+    result = add_site(cs, "25", "Islamabad")
+    ic(result)
     # add(cu,cs,cd)

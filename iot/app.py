@@ -27,9 +27,10 @@ cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}})
 
 @app.route('/users/',methods=['GET'])
 def get_users():
+    cu,cs,cd = db.main()
     if request.method == "GET":
         try:
-            cu,cs,cd = db.main()
+            
             users = dbquery.get_users(cu)
             ic(users)
             # result = json.dumps(users, default= json_util.default)
@@ -41,8 +42,31 @@ def get_users():
             return make_response(jsonify({'error': error_message}), 500)
     
     if request.method == "POST":
+        data = request.json
+        user_id = data.get("userID")
+        location = data.get("location")
+        no_of_people = data.get("noOfPeople")
+        total_trafic = data.get("totalTraffic")
+        total_male = data.get("totalMale")
+        total_female = data.get("totalFemale")
+        total_kids = data.get("totalKids")
+
+        if user_id is None or location is None or no_of_people is None or total_trafic is None or total_male is None or total_female is None or total_kids is None: 
+            result = {"error": "fields should not be none"}
+            return make_response(jsonify(result), 400)
+
+
+
         try: 
-            pass
+            user = dbquery.get_one_user()
+            if user:
+                site_id = dbquery.add_site(cs, user_id, location)
+                
+            
+            else: 
+                result = {"error": "User not found"}
+                return make_response(jsonify(result), 400)
+
         except:
             pass
 

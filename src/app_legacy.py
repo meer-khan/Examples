@@ -91,20 +91,29 @@ def pom_extractor():
         with a focus on [Content concept and narrative] 
         around [seasonality], 
         considering [Key E-commerce Dates] and [Industry-Specific Key Days], targeted at [Shop Locations].'''
-        data = request.get_json()
+        # data = request.get_json()
 
-        shop_categories = data.get("shop_categories", " ")
-        content_concept_n_narrative = data.get("ccn", " ")
-        seasionality = data.get("seasonality", " ")
-        key_e_commerce_dates = data.get("ked", " ")
-        industry_specific_key_days = data.get("iskd", " ")
-        shop_locations = data.get("shop_locations"," ")
+        # shop_categories = data.get("shop_categories", " ")
+        # content_concept_n_narrative = data.get("ccn", " ")
+        # seasionality = data.get("seasonality", " ")
+        # key_e_commerce_dates = data.get("ked", " ")
+        # industry_specific_key_days = data.get("iskd", " ")
+        # shop_locations = data.get("shop_locations"," ")
 
-        # * OUR STRING FOR PROMPT ENGINEERING
-        ques = f'''Generate an email campaign calendar for {shop_categories} 
-        with a focus on {content_concept_n_narrative} 
-        around {seasionality}, 
-        considering {key_e_commerce_dates} and {industry_specific_key_days}, targeted at {shop_locations}.'''
+        # # * OUR STRING FOR PROMPT ENGINEERING
+        # ques = f'''Generate an email campaign calendar for {shop_categories} 
+        # with a focus on {content_concept_n_narrative} 
+        # around {seasionality}, 
+        # considering {key_e_commerce_dates} and {industry_specific_key_days}, targeted at {shop_locations}.'''
+
+
+        ques = '''
+               You are an email marketer for online sneaker e-commerce store , can you suggest a list of email campaigns by looking at trends , 
+               holidays , sports and entertainment events , calendars , what’s hot topic on social media in the recent months , 
+               hot topics in relevant industries and consumer behaviors etc ? Please be creative and be relevant ,
+            targeting young professionals , university students , urban and rural populations. Can you please generate a similar prompt like above sentence and context mentioned in this prompt
+
+            '''
 
         # ic(ques)
 

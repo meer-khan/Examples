@@ -7,10 +7,6 @@ from werkzeug.utils import secure_filename
 import os, json, hashlib
 import jsonpickle
 from waitress import serve
-import pathlib
-from datetime import datetime
-import requests
-import openai
 from icecream import ic
 import db, dbquery
 from bson import json_util

@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from icecream import ic
 from datetime import datetime
-
+from bson import ObjectId
 
 def create_db(client):
     try:
@@ -60,9 +60,20 @@ def add_site(cs, user_id,  location):
     return str(inserted_record.inserted_id)
 
 
+def get_one_user(cu, user_id):
+    ic(user_id)
+    found_user = cu.find_one({"_id": user_id})
+    if found_user:
+        print(found_user)
+        return found_user
+    else:
+        print(found_user)
+        return None
+
 if __name__ == "__main__": 
     client = MongoClient("mongodb://localhost:27017/")
     cu,cs,cd = create_db(client)
     result = add_site(cs, "25", "Islamabad")
     ic(result)
     # add(cu,cs,cd)
+    get_one_user(cu, ObjectId("6570de6b3ef211653f6f8fb9"))

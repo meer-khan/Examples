@@ -14,7 +14,7 @@ def add_site(cs, user_id,  location):
     return str(inserted_record.inserted_id)
 
 def add_data(cd,site_id,user_id,no_of_people, total_traffic, total_male, total_female, total_kids):
-    cd.insert_one({"DataID": 1, "SiteID": site_id, "UserID":user_id, "TimeStamp": datetime.now() , "NoOfPeople": no_of_people, "Totaltrafic":total_traffic,
+    cd.insert_one({"DataID": 1, "SiteID": site_id, "UserID":user_id, "TimeStamp": datetime.utcnow() , "NoOfPeople": no_of_people, "Totaltrafic":total_traffic,
                     "TotalMale": total_male, "TotalFemale": total_female, "TotalKids": total_kids })
 
 def get_one_user(cu, user_id):

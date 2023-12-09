@@ -2,6 +2,8 @@ from pymongo import MongoClient
 from icecream import ic
 from datetime import datetime
 from bson import ObjectId
+from decouple import config
+
 
 def create_db(client):
     try:
@@ -50,7 +52,7 @@ def create_db(client):
 
 
 def main():
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient(f"mongodb://{config('HOST')}:{config('PORT')}/")
     cu,cs,cd = create_db(client)
     return cu,cs,cd
 

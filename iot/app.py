@@ -13,7 +13,7 @@ from bson import json_util
 
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
-cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}})
+cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, r"/addusers/": {"origins": config("ORIGIN")}})
 
 
 

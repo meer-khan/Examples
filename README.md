@@ -81,17 +81,17 @@ http://127.0.0.1:5000/prompt/
 
 - Content-Type: application/json
 
-#### Body
+#### Form-data
 
-```json
-{
-    "shop_categories": "Clothing",
-    "ccn": "Seasonal Discounts", //Content concept and narrative
-    "seasonality": "Spring",
-    "ked": "Black Friday",  //Key E-commerce Dates
-    "iskd": "Fashion Week", //Industry-Specific Key Days
-    "shop_locations": "Online, New York"
-}
+```
+    "file" = "multi-part file"
+    "shop_categories" = "Clothing"
+    "ccn" = "Seasonal Discounts" //Content concept and narrative
+    "seasonality" = "Spring"
+    "ked" = "Black Friday" //Key E-commerce Dates
+    "iskd" = "Fashion Week" //Industry-Specific Key Days
+    "shop_locations" = "Online, New York"
+
 ```
   
 ### Response

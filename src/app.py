@@ -1,154 +1,127 @@
 from flask import Flask,redirect,url_for,request,jsonify, make_response, flash
-from markupsafe import escape
 from decouple import config
 from flask_cors import CORS
 from flask_cors import cross_origin
 from werkzeug.utils import secure_filename
-import os
-import jsonpickle
 from waitress import serve
-import pathlib
-from datetime import datetime
-import requests
 import openai
 from icecream import ic
+import pandas as pd
+from werkzeug.utils import secure_filename
+import pathlib
+import uuid, os
 
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/prompt/": {"origins": config("ORIGIN")}})
-
-
-# .env 
-# ALLOWED_HOSTS=localhost,127.0.0.1
+app.config['UPLOAD_FOLDER'] = config("uploadFolder")
+ALLOWED_EXTENSIONS = (".xlsx", )
 # Get a list of values
 # allowed_hosts = config('ALLOWED_HOSTS', default='', cast=lambda v: [s.strip() for s in v.split(',')])
 
 key = config("KEY")
 openai.api_key = key
 
-
-# response = openai.ChatCompletion.create(
-#   model="gpt-4-1106-preview",
-#   messages=[
-#         {"role": "user", "content": ""},
-#     ]
-# )
-
 def update_chat(messages, role, content):
     messages.append({"role": role, "content": content})
     return messages
 
 
-def get_chatgpt_response(messages):
-  response = openai.ChatCompletion.create(
-  model="gpt-4-1106-preview",
-  messages=messages
-)
-  return  response['choices'][0]['message']['content']
+def get_chatgpt_response(messages, tokens):
+    response = openai.ChatCompletion.create(
+        model="gpt-4-1106-preview",
+        messages=messages, 
+        max_tokens = tokens
+    )
+    # ic(response)
+    return response['choices'][0]['message']['content']
 
 
-def print_last_message(messages):
-    if messages:
-        last_message = messages[-1]
-        print(last_message["role"] + ": " + last_message["content"])
+def get_file_content(file_path):
+    # file_path = r'D:\2022\Examples\test\Test 2.xlsx'
 
-def get_last_message(messages):
-    if messages:
-        last_message = messages[-1]
-        return last_message["role"] + ": " + last_message["content"]
+    df = pd.read_excel(file_path)
+    sample_data = df.head(20).to_string(index=False)
+    return sample_data
 
-'''
-You are an email marketer for online [sneaker e-commerce store] , 
-can you suggest a list of email campaigns by looking at trends ,
-[holidays , sports and entertainment events , calendars] , what’s hot 
-topic on [social media]  in the recent [months] , hot topics in relevant industries and 
-consumer behaviors etc ? Please be creative and be relevant , targeting [young professionals , 
-university students , urban and rural populations]
+def initiate_context():
+    context = [{"role":"system", "content": "consider yourself as strategist and implementor"}]
+    return context
 
-Generate an email campaign calendar for [sports] with a focus on [stay healthy 
-and physically healthy] around [summer], considering [summer holidays] and, targeted at [F10, 
-Islamabad Pakistan]
-'''
-# f'''
-# You are an email marketer for online {shop_categories} , 
-# can you suggest a list of email campaigns by looking at trends ,
-# {content_concept_n_narrative} , what’s hot 
-# topic on social media  in the recent {seasionality} , hot topics in relevant industries and 
-# consumer behaviors etc ? Please be creative and be relevant , targeting {shop_locations}
+def get_extension(file):
+    return pathlib.Path(file).suffix
 
-# '''
+def generate_unique_name(file_name):
+    return file_name+ str(uuid.uuid4())
 
+def validate_data(shop_categories,content_concept_n_narrative,seasionality,key_e_commerce_dates,industry_specific_key_days,shop_locations):
+    
+    if shop_categories == None: 
+            shop_categories = "online store"
 
-# PREVIOUS PARAMS
-'''
+    if content_concept_n_narrative == None: 
+        content_concept_n_narrative = "relevant to shop categories for US market"
 
-{
-    "shop_categories": "sports", 
-    "ccn": "stay healthy and physically healthy",  //Content concept and narrative
-    "seasionality": "winter", 
-    //"ked": "winter holidays", //Key E-commerce Dates
-    //"iskd": "", //Industry-Specific Key Days
-    "shop_locations": "4802 Rockwell Lane,  Rocky Mount, North Carolina"
-}
+    if seasionality == None: 
+        seasionality = "current season"
 
-'''
+    if key_e_commerce_dates == None: 
+        key_e_commerce_dates = "1 month"
 
-def validator(sc=" ", ccn=" ", seas=" ", ked = " ", iskd= " ", sl= " "): 
-    pass
+    if industry_specific_key_days == None: 
+        industry_specific_key_days = "relevant to shop categories"
+
+    if shop_locations == None: 
+        shop_locations = "online store"
+    
+
+    return shop_categories, content_concept_n_narrative, seasionality, key_e_commerce_dates, industry_specific_key_days, shop_locations
 
 
 
 
 @app.route('/prompt/',methods=['POST'])
 def pom_extractor():
-    try:
-        messages = [
-        {"role": "user", "content": "   "},
-        {"role": "assistant", "content": "   "},
-        ]
+    # try:
+        messages = initiate_context()
+        print(messages)
+        # data = request.get_json()
 
-        '''Generate an email campaign calendar for [Shop Categories] 
-        with a focus on [Content concept and narrative] 
-        around [seasonality], 
-        considering [Key E-commerce Dates] and [Industry-Specific Key Days], targeted at [Shop Locations].'''
-        data = request.get_json()
-        # ques = data.get("question","")
 
-        shop_categories = data.get("shop_categories", "online store")
-        content_concept_n_narrative = data.get("ccn", "relevant to shop categories")
-        seasionality = data.get("seasonality", "current season")
-        key_e_commerce_dates = data.get("ked", "weekly calendar for next 3 months")
-        industry_specific_key_days = data.get("iskd", "relevant to shop categories")
-        shop_locations = data.get("shop_locations","online store")
+        # ques = request.form.get('question')
+        # Get the file from the form data
+        file = request.files.get('file') 
 
-        if shop_categories == None: 
-            shop_categories = "online store"
 
-        if content_concept_n_narrative == None: 
-            content_concept_n_narrative = "relevant to shop categories"
-
-        if seasionality == None: 
-            seasionality = "current season"
-
-        if key_e_commerce_dates == None: 
-            key_e_commerce_dates = "weekly calendar for next 3 months"
-
-        if industry_specific_key_days == None: 
-            industry_specific_key_days = "relevant to shop categories"
-
-        if shop_locations == None: 
-            shop_locations = "online store"
+        shop_categories = request.form.get('shop_categories')
+        content_concept_n_narrative = request.form.get('ccn')
+        seasionality = request.form.get('seasionality')
+        key_e_commerce_dates = request.form.get('ked')
+        industry_specific_key_days = request.form.get('iskd')
+        shop_locations = request.form.get('shop_locations')
         
-        # * OUR STRING FOR PROMPT ENGINEERING
-        # ques = f'''Generate an email campaign calendar for {shop_categories} 
-        # with a focus on {content_concept_n_narrative} 
-        # around {seasionality}, 
-        # considering {key_e_commerce_dates} and {industry_specific_key_days}, targeted at {shop_locations}.'''
+        shop_categories, content_concept_n_narrative, seasionality, key_e_commerce_dates, industry_specific_key_days, shop_locations= validate_data(shop_categories, 
+                                                                                                                                                    content_concept_n_narrative, 
+                                                                                                                                                    seasionality,
+                                                                                                                                                    key_e_commerce_dates, 
+                                                                                                                                                    industry_specific_key_days, 
+                                                                                                                                                    shop_locations)
+        prompt = f'''
+            "Please Rephrase this given text in 60 words, "Generate weekly calendar campaigns, for the shopify store
+                            {shop_categories} with a focus on {content_concept_n_narrative}
+                            around {seasionality}, considering for {key_e_commerce_dates} and {industry_specific_key_days},
+                            targeted at {shop_locations},  
+                            I want you to return a table with campaign ideas, reasoning, targeted audiences."  
+            '''
+        
+        result = update_chat(messages, role="user", content=prompt)
+        ic("1st CALL OF CHATGPT")
+        rephrased_text = get_chatgpt_response(result, 70)
+        result = update_chat(result, role="assistant", content=rephrased_text)
 
-
-        # *: NEW CODE
-        ques = f'''
-                Please create and rephrase Prompt for weekly calendar campaigns, next 3 months from now, for the shopify store
+        if request.files.get("file") is None: 
+            ques = f'''
+                Please Generate weekly calendar campaigns, next 3 months from now, for the shopify store
                 {shop_categories} with a focus on {content_concept_n_narrative}
                 around {seasionality}, considering {key_e_commerce_dates} and {industry_specific_key_days},
                 targeted at {shop_locations}, 
@@ -157,50 +130,67 @@ def pom_extractor():
                 tailored according to seasonality, trends, shop category, what the shops products are, key e-commerce days, 
                 3 days a week at least. 
             '''
-        
-        ic (ques)
-# Please act like a strategist and implementor and generate relevant chatgpt prompt to get above results.
-# Please generate relevant chatgpt prompt to get above results.
-        # ques = '''
-        #     Please create and rephrase only Prompt for weekly calendar campaigns, next 3 months from now, for the 
-        #     shopify “sports and lifestyle clothing  with a focus Stay physically healtyh and active, around winter at  
-        #     4802 Rockwell Lane,  Rocky Mount, North Carolina”, consider yourself as strategist and implementor and also 
-        #     emphasize to generate data in tabular. I want you to return a table with campaign ideas, reasoning, 
-        #     targeted audiences, Prompt should be tailored according to seasonality, trends, shop category, what the shops products
-        #     are, key e-commerce days, 3 days a week at least.
+            result = update_chat(messages=result, role='user', content=ques)
+            ic("2nd CALL OF CHATGPT")
+            response = get_chatgpt_response(result, 4096)
+            print(response)
 
-        #     '''
+            # NEW CODE
+            result = update_chat(messages=result, role='assistant', content=response)
+            prompt = 'Generate HTML code of above table'
+            result = update_chat(messages=result, role='user', content=prompt)
 
-        # ques = '''
-        #     Please create and rephrase only Prompt for weekly calendar campaigns, 
-        #     next 3 months from now, for the shopify sports and lifestyle clothing  with a focus Stay physically 
-        #     healtyh and active, around winter at  4802 Rockwell Lane,  Rocky Mount, North Carolina, 
+            response = get_chatgpt_response(result, 4096)
 
-        #     consider yourself as strategist and implementor, Prompt should be tailored according to seasonality, 
-        #     trends, shop category, what the shops products are, key e-commerce days,
-        #     '''
+            print(response)
 
-        # *: END CODE
 
-        messages = update_chat(messages, "user", ques)
-        # ic(messages)
-        model_response = get_chatgpt_response(messages)
-        # ic(model_response)
-        messages = update_chat(messages, "assistant", model_response)
-        # ic(messages)
-        print_last_message(messages)
-        result = get_last_message(messages)
-        result = {"response": result}
-        return make_response(jsonify(result), 200)
-    except Exception as e:
-        # Handle other exceptions
-        error_message = f"An unexpected error occurred: {str(e)}"
-        return make_response(jsonify({'error': error_message}), 500)
+            # END CODE
+
+
+
+            final_output = {"rephrasedPrompt":rephrased_text, "response": response}
+            return make_response(jsonify(final_output), 200)
+
+        elif request.files.get("file") is not None:
+            ic("FILE RECEIVED")
+            file_name = secure_filename(file.filename)
+            ext = get_extension(file_name)
+            if ext  not in ALLOWED_EXTENSIONS:
+                return make_response(jsonify({"error": "Invalid Input File, It Should Be in .xlsx Format"}), 400)
+            Uname = generate_unique_name(file_name)
+            file_path  = os.path.join(config('uploadFolder'), Uname)
+            file.save(file_path)
+            data = get_file_content(file_path)
+
+            result = update_chat(messages=result, role="user", content=data)
+            ic("2nd CALL OF CHATGPT")
+            response = get_chatgpt_response(result, 4096)
+            result = update_chat(messages=result, role='assistant', content=response)
+            final_prompt = f"Please suggest atleast 1 product for each weekly calendar campaigns for {key_e_commerce_dates} in tabular form. Use above data to generate campaign."
+            result = update_chat(messages=result, role='user', content=final_prompt)
+            ic("3rd CALL OF CHATGPT")
+            response = get_chatgpt_response(result, 4096)
+            result = update_chat(messages=result, role='assistant', content=response)
+            final_prompt = "Convert this table into HTML Tables"
+            result = update_chat(messages=result, role='user', content=final_prompt)
+            response = get_chatgpt_response(result, 4096)
+            print(response)
+            final_output = {"rephrasedPrompt":rephrased_text, "response": response}
+            os.remove(file_path)
+            return make_response(jsonify(final_output), 200)
+        else: 
+            error_message = {"error":{"Data is Incomplete"}}
+            return make_response(jsonify(error_message), 400)
+    # except Exception as e:
+    #     # Handle other exceptions
+    #     error_message = f"An unexpected error occurred: {str(e)}"
+    #     return make_response(jsonify({'error': error_message}), 500)
 
 
 
 if __name__ == "__main__":
-        
+    os.makedirs(config("uploadFolder"),exist_ok=True)
     if config("MODE") == 'DEV':
         app.run(host='localhost', debug=True, port=5000)
     if config("MODE") == 'PROD':

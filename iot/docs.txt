@@ -1,0 +1,82 @@
+.env explained:
+    >> Add port of database in "PORT" key
+    >> Add your domain in .env file key "ORIGIN" 
+    >> "MODE" is in 'PROD' for production but you can set it to "DEV" for development
+
+WSGI server explained:
+    >> Waitress is used as WSGI Server (LICENSE: ZPL (permissive))
+
+Run Instruction: 
+    >> Create Python virutal environment (Instructions for creating Python virtual enviroment is given below)
+    >> Activate your python virtual environment 
+    >> Install packages from requirements.txt file using command 
+    >> Go into iot Directory in your command prompt or vscode terminal (where you activated virtual environment)
+    >> python app.py 
+
+
+How to Create Python Virtual Environment: 
+    >> python -m venv venv
+    >> venv\Scripts\activate (for windows)
+    >> source venv/bin/activate (for linux)
+
+
+API Documentation: 
+
+BASE URL: 
+    >> http://127.0.0.1:5000
+
+ENDPOINTS: 
+    >> /user/ 
+    >> /adduser/
+
+METHOD: 
+    >> POST , GET
+
+REQUEST HEADERS: 
+    >> Content-Type: application/json
+
+BODY: 
+    {
+    "userID": "",
+    "location": "Lahore, Hall Road", 
+    "noOfPeople": 100,
+    "totalTraffic": 10,
+    "totalMale":90,
+    "totalFemale":140,
+    "totalKids":10 
+}
+
+
+RESPONSE: 
+    >> Status code 201 , Success 
+    {
+    "msg": "data added successfully"
+    }
+
+
+INSTRUCTIONS: 
+    >> /user/ , use GET method to get all users data 
+    >> /addusers/, use POST method to add a user in the database with following parameters 
+    {
+    "brandName": "",
+    "email": "", 
+    "password": , 
+    "location": ""
+    }
+
+    >> /users/, use POST method to add data in the "Data" collection with the following parameters
+    {
+    "userID": "65760b7dd8be27567528f722",
+    "location": "", 
+    "noOfPeople": 100,
+    "totalTraffic": 10,
+    "totalMale":90,
+    "totalFemale":140,
+    "totalKids":10 
+    }
+    NOTE: Use the exact user id (given above) to add the data in the database
+
+
+ERROR: 
+    >> Status Code: 500, 400 
+    { "error": "An unexpected error occurred: Error details here." }

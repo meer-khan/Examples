@@ -64,3 +64,16 @@ Islamabad Pakistan]
 }
 
 '''
+
+
+
+
+
+Please Generate weekly calendar campaigns, next 3 months from now, for the shopify store
+                {shop_categories} with a focus on {content_concept_n_narrative}
+                around {seasionality}, considering {key_e_commerce_dates} and {industry_specific_key_days},
+                targeted at {shop_locations}, 
+                consider yourself as strategist and implementor and also emphasize to generate data in tabular. 
+                I want you to return a table with campaign ideas, reasoning, targeted audiences, Prompt should be 
+                tailored according to seasonality, trends, shop category, what the shops products are, key e-commerce days, 
+                3 days a week at least. 

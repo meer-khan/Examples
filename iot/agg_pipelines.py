@@ -296,7 +296,8 @@ current_utc_time = datetime.utcnow()
 start_time_last_30_days = current_utc_time - timedelta(days=30)
 
 # Aggregation pipeline for the last 30 days
-
+def today_visit_by_gender_last_30_days():
+    pass
 
 pipeline_last_30_days = [
     {
@@ -345,7 +346,8 @@ current_utc_time = datetime.utcnow()
 
 # Calculate the start time for the last 7 hours
 start_time_last_7_hours = current_utc_time - timedelta(hours=7)
-
+def today_visit_by_gender_last_7_hours():
+    pass
 # Aggregation pipeline for the last 7 hours by timeslot
 pipeline_last_7_hours = [
     {
@@ -409,6 +411,9 @@ current_utc_time = datetime.utcnow()
 start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
 
 # Aggregation pipeline for the last 7 weeks
+
+def today_visit_in_last_7_weeks():
+    pass
 pipeline_last_7_weeks = [
     {
         "$match": {
@@ -451,6 +456,8 @@ current_utc_time = datetime.utcnow()
 start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
 
 # Aggregation pipeline for the last 7 weeks by TotalMale and TotalFemale
+def today_visit_by_gender_last_7_weeks():
+    pass
 pipeline_last_7_weeks_gender = [
     {
         "$match": {
@@ -511,6 +518,8 @@ current_utc_time = datetime.utcnow()
 start_time_last_12_months = current_utc_time - timedelta(days=365)
 
 # Aggregation pipeline for the last 12 months by TotalMale and TotalFemale
+def today_visit_by_gender_last_12_months():
+    pass
 pipeline_last_12_months_gender = [
     {
         "$match": {

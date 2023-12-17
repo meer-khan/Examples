@@ -167,7 +167,7 @@ def avg_hourly_visits(collection):
 
     # Create a JSON response
     json_response = {
-        "average_hourly_visitors": average_hourly_visitors
+        "avgHourlyVisits": average_hourly_visitors
     }
 
     print(json_response)
@@ -197,7 +197,7 @@ def avg_daily_visit(collection):
 
     # Create a JSON response
     json_response = {
-        "avgHourlyVisits": average_daily_visitors_mapped
+        "avgDailyVisits": average_daily_visitors_mapped
     }
 
     print(json_response)
@@ -251,6 +251,7 @@ def gender_trend_30_days(collection):
     # Print the JSON response
     ic("******** DAILY VISIT TREND BY GENDER ********************")
     print(json_response)
+    return json_response
 
 
 

@@ -2,11 +2,11 @@ from datetime import datetime, timedelta
 from pymongo import MongoClient
 from icecream import ic
 # Connect to MongoDB
-client = MongoClient("mongodb://localhost:27017/")
-db = client["CoffeeShop"]
-collection = db["Data"]
+# client = MongoClient("mongodb://localhost:27017/")
+# db = client["CoffeeShop"]
+# collection = db["Data"]
 
-def total_visit_last_24_hours():
+def total_visit_last_24_hours(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_24_hours = current_utc_time - timedelta(hours=24)
     start_time_previous_24_hours = start_time_last_24_hours - timedelta(hours=24)
@@ -54,7 +54,7 @@ def total_visit_last_24_hours():
 
 
 
-def total_visit_last_7_days():
+def total_visit_last_7_days(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_7_days = current_utc_time - timedelta(days=7)
     start_time_previous_7_days = start_time_last_7_days - timedelta(days=7)
@@ -103,7 +103,7 @@ def total_visit_last_7_days():
 
 
 
-def male_female_kids_count_per_day():
+def male_female_kids_count_today(collection):
     current_utc_time = datetime.utcnow()
     start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
     pipeline_current_day = [
@@ -132,15 +132,15 @@ def male_female_kids_count_per_day():
     print("Total Kids on Current Day:", total_kids_current_day)
 
     json_response={
-        "maleCount":total_male_current_day,
-        "femaleCount": total_female_current_day,
-        "kidsCount": total_kids_current_day
+        "todayMaleCount":total_male_current_day,
+        "todayFemaleCount": total_female_current_day,
+        "todayKidsCount": total_kids_current_day
     }
 
     return  json_response
 
 
-def avg_hourly_visits():
+def avg_hourly_visits(collection):
     pipeline_avg_hourly_visitors = [
         {
             "$group": {
@@ -175,7 +175,7 @@ def avg_hourly_visits():
 
 
 
-def avg_daily_visit():
+def avg_daily_visit(collection):
     pipeline_avg_daily_visitors = [
         {
             "$group": {
@@ -214,7 +214,7 @@ def avg_daily_visit():
 #******** DAILY VISIT TREND BY GENDER ********************
 
 # DAILY GENDER TREND
-def gender_trend_30_days():
+def gender_trend_30_days(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_30_days = current_utc_time - timedelta(days=30)
     pipeline_last_30_days = [
@@ -261,7 +261,7 @@ def gender_trend_30_days():
 
 
 # GENDER TREND LAST 7 WEEKS
-def gender_trend_last_7_weeks():
+def gender_trend_last_7_weeks(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
     pipeline_last_7_weeks_gender = [
@@ -313,16 +313,11 @@ def gender_trend_last_7_weeks():
 
 
 
-
-
-
-
-
 # ********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************
 
 
 # Aggregation pipeline for the last 12 months by TotalMale and TotalFemale
-def gender_trend_12_months():
+def gender_trend_12_months(collection):
     current_utc_time = datetime.utcnow()
     # Calculate the start time for the last 12 months
     start_time_last_12_months = current_utc_time - timedelta(days=365)
@@ -375,13 +370,9 @@ def gender_trend_12_months():
 
 
 
-
-
-
-
 # ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
 
-def gender_trend_monthly_visits_for_last_12_months():
+def gender_trend_monthly_visits_for_last_12_months(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_12_months = current_utc_time - timedelta(days=365)
     pipeline_last_12_months = [
@@ -432,7 +423,7 @@ def gender_trend_monthly_visits_for_last_12_months():
 
 # *********** Gender Distribution for last 7 hours *************** 
 
-def gender_trend_last_7_hours():
+def gender_trend_last_7_hours(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_7_hours = current_utc_time - timedelta(hours=7)
     pipeline_last_7_hours = [

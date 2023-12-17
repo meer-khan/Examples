@@ -206,62 +206,14 @@ def avg_daily_visit():
 
 
 
-
-
-
-
-# ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
-
-def gender_trend_monthly_visits_for_last_12_months():
-    current_utc_time = datetime.utcnow()
-    start_time_last_12_months = current_utc_time - timedelta(days=365)
-    pipeline_last_12_months = [
-        {
-            "$match": {
-                "TimeStamp": {"$gte": start_time_last_12_months, "$lt": current_utc_time}
-            }
-        },
-        {
-            "$group": {
-                "_id": {
-                    "year": {"$year": "$TimeStamp"},
-                    "month": {"$month": "$TimeStamp"}
-                },
-                "total_visitors": {"$sum": "$NoOfPeople"}
-            }
-        },
-        {
-            "$sort": {"_id.year": 1, "_id.month": 1}
-        }
-    ]
-
-    # Execute the aggregation
-    result_last_12_months = list(collection.aggregate(pipeline_last_12_months))
-
-    # Extract the results
-    total_visitors_last_12_months = [{"year": entry["_id"]["year"], "month": entry["_id"]["month"], "total_visitors": entry["total_visitors"]} for entry in result_last_12_months]
-
-    # Create a JSON response
-    json_response = {
-        "totalVisitsLast12Months": total_visitors_last_12_months
-    }
-
-    # Print the JSON response
-    ic("****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********")
-    print(json_response)
-    return json_response
-
-
-
-
-
+#  ! ________________________________________________________________________-
 
 
 
 
 #******** DAILY VISIT TREND BY GENDER ********************
 
-# Aggregation pipeline for the last 30 days
+# DAILY GENDER TREND
 def gender_trend_30_days():
     current_utc_time = datetime.utcnow()
     start_time_last_30_days = current_utc_time - timedelta(days=30)
@@ -305,53 +257,10 @@ def gender_trend_30_days():
 
 
 
-
-# ************** Weekly total visitors trends for last 7 weeks ***************
-
-# Aggregation pipeline for the last 7 weeks
-
-def today_visit_in_last_7_weeks():
-    current_utc_time = datetime.utcnow()
-    start_time_last_7_weeks= current_utc_time - timedelta(hours=7)
-    pipeline_last_7_weeks = [
-        {
-            "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_weeks, "$lt": current_utc_time}
-            }
-        },
-        {
-            "$group": {
-                "_id": {"$week": "$TimeStamp"},
-                "total_visitors": {"$sum": "$NoOfPeople"}
-            }
-        },
-        {
-            "$sort": {"_id": 1}
-        }
-    ]
-
-    result_last_7_weeks = list(collection.aggregate(pipeline_last_7_weeks))
-
-    weekly_visit_trend = [{"week": entry["_id"], "total_visitors": entry["total_visitors"]} for entry in result_last_7_weeks]
-
-    json_response = {
-        "weekly_visit_trend_last_7_weeks": weekly_visit_trend
-    }
-
-    ic("************** Weekly total visitors trends for last 7 weeks ***************")
-    print(json_response)
-
-
-
-
-
-
-
-
 # *********** Weekly visiotrs trend for male and female  ************** 
 
 
-# Aggregation pipeline for the last 7 weeks by TotalMale and TotalFemale
+# GENDER TREND LAST 7 WEEKS
 def gender_trend_last_7_weeks():
     current_utc_time = datetime.utcnow()
     start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
@@ -463,6 +372,56 @@ def gender_trend_12_months():
     ic("********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************")
     print(json_response)
     return json_response
+
+
+
+
+
+
+
+# ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
+
+def gender_trend_monthly_visits_for_last_12_months():
+    current_utc_time = datetime.utcnow()
+    start_time_last_12_months = current_utc_time - timedelta(days=365)
+    pipeline_last_12_months = [
+        {
+            "$match": {
+                "TimeStamp": {"$gte": start_time_last_12_months, "$lt": current_utc_time}
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "year": {"$year": "$TimeStamp"},
+                    "month": {"$month": "$TimeStamp"}
+                },
+                "total_visitors": {"$sum": "$NoOfPeople"}
+            }
+        },
+        {
+            "$sort": {"_id.year": 1, "_id.month": 1}
+        }
+    ]
+
+    # Execute the aggregation
+    result_last_12_months = list(collection.aggregate(pipeline_last_12_months))
+
+    # Extract the results
+    total_visitors_last_12_months = [{"year": entry["_id"]["year"], "month": entry["_id"]["month"], "total_visitors": entry["total_visitors"]} for entry in result_last_12_months]
+
+    # Create a JSON response
+    json_response = {
+        "totalVisitsLast12Months": total_visitors_last_12_months
+    }
+
+    # Print the JSON response
+    ic("****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********")
+    print(json_response)
+    return json_response
+
+
+
 
 
 

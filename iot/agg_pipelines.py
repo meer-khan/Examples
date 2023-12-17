@@ -6,16 +6,11 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["CoffeeShop"]
 collection = db["Data"]
 
-
-
-
-
 def total_visit_last_24_hours():
     current_utc_time = datetime.utcnow()
     start_time_last_24_hours = current_utc_time - timedelta(hours=24)
     start_time_previous_24_hours = start_time_last_24_hours - timedelta(hours=24)
         
-    # Aggregation pipeline for the last 24 hours
     pipeline_last_24_hours = [
         {
             "$match": {
@@ -51,6 +46,11 @@ def total_visit_last_24_hours():
     user_count_difference = user_count_last_24_hours - user_count_previous_24_hours
     print("Visitor Count Last 24 Hours:", user_count_last_24_hours)
     print("Visitor Count Difference 24 Hours:", user_count_difference)
+    json_response = {
+        "visitorLast24Hour":user_count_last_24_hours,
+        "visitorPrevious24Hour": user_count_previous_24_hours
+    }
+    return json_response
 
 
 
@@ -94,18 +94,16 @@ def total_visit_last_7_days():
 
     print("Visitor Count Last 7 Days:", user_count_last_7_days)
     print("Visitor Count Previous 7 Days:", user_count_previous_7_days)
+    json_response = {
+        "visitorLast7Days":user_count_last_7_days, 
+        "visitorPrevious7Days": user_count_previous_7_days
+    }
+
+    return json_response
 
 
 
-
-
-
-
-
-# Calculate the start time for the current day
-
-
-def today_male_female_kids_count_per_day():
+def male_female_kids_count_per_day():
     current_utc_time = datetime.utcnow()
     start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
     pipeline_current_day = [
@@ -133,6 +131,13 @@ def today_male_female_kids_count_per_day():
     print("Total Female on Current Day:", total_female_current_day)
     print("Total Kids on Current Day:", total_kids_current_day)
 
+    json_response={
+        "maleCount":total_male_current_day,
+        "femaleCount": total_female_current_day,
+        "kidsCount": total_kids_current_day
+    }
+
+    return  json_response
 
 
 
@@ -169,16 +174,11 @@ def avg_hourly_visits():
     }
 
     print(json_response)
-
-
-
+    return json_response
 
 
 
 def avg_daily_visit():
-    
-
-    # Aggregation pipeline for average daily visitors
     pipeline_avg_daily_visitors = [
         {
             "$group": {
@@ -204,6 +204,7 @@ def avg_daily_visit():
     }
 
     print(json_response)
+    return json_response
 
 
 

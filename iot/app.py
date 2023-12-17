@@ -10,7 +10,7 @@ from waitress import serve
 from icecream import ic
 import db, dbquery
 from bson import json_util
-
+import agg_pipelines
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, r"/addusers/": {"origins": config("ORIGIN")}})
@@ -18,7 +18,22 @@ cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, r"/adduse
 
 @app.route("/analytics/total_visits/", methods= ["GET"])
 def total_visits(): 
-    pass
+    t_24h = agg_pipelines.total_visit_last_24_hours(cd)
+    t_7d = agg_pipelines.total_visit_last_7_days(cd)
+    c_t = agg_pipelines.male_female_kids_count_today(cd)
+    a_h = agg_pipelines.avg_hourly_visits(cd)
+    a_d = agg_pipelines.avg_daily_visit(cd)
+    g_30d = agg_pipelines.gender_trend_30_days(cd)
+    g_7w = agg_pipelines.gender_trend_last_7_weeks(cd)
+    g_12m = agg_pipelines.gender_trend_12_months(cd)
+    g_t_12m = agg_pipelines.gender_trend_monthly_visits_for_last_12_months(cd)
+    g_7h = agg_pipelines.gender_trend_last_7_hours(cd)
+
+    t_24h.update(t_7d)
+    t_24h.update(c_t)
+
+    result = json.dumps(t_24h)
+    return make_response(result,200)
 
 
 
@@ -74,8 +89,6 @@ def user():
         if user_id is None or location is None or no_of_people is None or total_traffic is None or total_male is None or total_female is None or total_kids is None: 
             result = {"error": "fields should not be none"}
             return make_response(jsonify(result), 400)
-
-
 
         try: 
             user = dbquery.get_one_user(cu,user_id)

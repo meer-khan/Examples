@@ -376,5 +376,166 @@ json_response = {
 }
 
 # Print the JSON response
-ic("******************Gender Distribution for last 7 hours****************")
+ic("****************** TOTAL MALE AND FEMALE FOR LAST 7 HOURS ****************")
+print(json_response)
+
+
+
+
+
+
+
+# ************** Weekly total visitors trends for last 7 weeks ***************
+current_utc_time = datetime.utcnow()
+
+# Calculate the start time for the last 7 weeks
+start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
+
+# Aggregation pipeline for the last 7 weeks
+pipeline_last_7_weeks = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_7_weeks, "$lt": current_utc_time}
+        }
+    },
+    {
+        "$group": {
+            "_id": {"$week": "$TimeStamp"},
+            "total_visitors": {"$sum": "$NoOfPeople"}
+        }
+    },
+    {
+        "$sort": {"_id": 1}
+    }
+]
+
+result_last_7_weeks = list(collection.aggregate(pipeline_last_7_weeks))
+
+weekly_visit_trend = [{"week": entry["_id"], "total_visitors": entry["total_visitors"]} for entry in result_last_7_weeks]
+
+json_response = {
+    "weekly_visit_trend_last_7_weeks": weekly_visit_trend
+}
+
+ic("************** Weekly total visitors trends for last 7 weeks ***************")
+print(json_response)
+
+
+
+
+
+
+
+
+# *********** Weekly visiotrs trend for male and female  ************** 
+current_utc_time = datetime.utcnow()
+
+# Calculate the start time for the last 7 weeks
+start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
+
+# Aggregation pipeline for the last 7 weeks by TotalMale and TotalFemale
+pipeline_last_7_weeks_gender = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_7_weeks, "$lt": current_utc_time}
+        }
+    },
+    {
+        "$project": {
+            "week": {"$week": "$TimeStamp"},
+            "total_male": "$TotalMale",
+            "total_female": "$TotalFemale"
+        }
+    },
+    {
+        "$group": {
+            "_id": {"week": "$week"},
+            "total_male": {"$sum": "$total_male"},
+            "total_female": {"$sum": "$total_female"}
+        }
+    },
+    {
+        "$sort": {"_id.week": 1}
+    }
+]
+
+# Execute the aggregation
+result_last_7_weeks_gender = list(collection.aggregate(pipeline_last_7_weeks_gender))
+
+# Extract the results
+weekly_gender_visit_trend = [
+    {
+        "week": entry["_id"]["week"],
+        "total_male": entry["total_male"],
+        "total_female": entry["total_female"]
+    } for entry in result_last_7_weeks_gender
+]
+
+# Create a JSON response
+json_response = {
+    "weekly_gender_visit_trend_last_7_weeks": weekly_gender_visit_trend
+}
+
+# Print the JSON response
+ic("*********** Weekly visiotrs trend for male and female  ************** ")
+print(json_response)
+
+
+
+
+
+
+
+
+# ********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************
+current_utc_time = datetime.utcnow()
+
+# Calculate the start time for the last 12 months
+start_time_last_12_months = current_utc_time - timedelta(days=365)
+
+# Aggregation pipeline for the last 12 months by TotalMale and TotalFemale
+pipeline_last_12_months_gender = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_12_months, "$lt": current_utc_time}
+        }
+    },
+    {
+        "$project": {
+            "month": {"$month": "$TimeStamp"},
+            "total_male": "$TotalMale",
+            "total_female": "$TotalFemale"
+        }
+    },
+    {
+        "$group": {
+            "_id": {"month": "$month"},
+            "total_male": {"$sum": "$total_male"},
+            "total_female": {"$sum": "$total_female"}
+        }
+    },
+    {
+        "$sort": {"_id.month": 1}
+    }
+]
+
+# Execute the aggregation
+result_last_12_months_gender = list(collection.aggregate(pipeline_last_12_months_gender))
+
+# Extract the results
+monthly_gender_visit_trend = [
+    {
+        "month": entry["_id"]["month"],
+        "total_male": entry["total_male"],
+        "total_female": entry["total_female"]
+    } for entry in result_last_12_months_gender
+]
+
+# Create a JSON response
+json_response = {
+    "monthly_gender_visit_trend_last_12_months": monthly_gender_visit_trend
+}
+
+# Print the JSON response
+ic("********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************")
 print(json_response)

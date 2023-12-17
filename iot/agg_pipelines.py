@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from pymongo import MongoClient
-
+from icecream import ic
 # Connect to MongoDB
 client = MongoClient("mongodb://localhost:27017/")
 db = client["CoffeeShop"]
@@ -217,3 +217,101 @@ print(json_response)
 
 # If you want to print the formatted JSON, you can use the following line instead:
 # print(json.dumps(json_response, indent=2))
+
+
+
+
+
+
+
+# ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
+current_utc_time = datetime.utcnow()
+start_time_last_12_months = current_utc_time - timedelta(days=365)
+
+# Aggregation pipeline for the last 12 months
+pipeline_last_12_months = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_12_months, "$lt": current_utc_time}
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "year": {"$year": "$TimeStamp"},
+                "month": {"$month": "$TimeStamp"}
+            },
+            "total_visitors": {"$sum": "$NoOfPeople"}
+        }
+    },
+    {
+        "$sort": {"_id.year": 1, "_id.month": 1}
+    }
+]
+
+# Execute the aggregation
+result_last_12_months = list(collection.aggregate(pipeline_last_12_months))
+
+# Extract the results
+total_visitors_last_12_months = [{"year": entry["_id"]["year"], "month": entry["_id"]["month"], "total_visitors": entry["total_visitors"]} for entry in result_last_12_months]
+
+# Create a JSON response
+json_response = {
+    "total_visitors_last_12_months": total_visitors_last_12_months
+}
+
+# Print the JSON response
+print("****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********")
+print(json_response)
+
+
+
+
+
+
+
+
+
+#******** DAILY VISIT TREND BY GENDER ********************
+
+
+current_utc_time = datetime.utcnow()
+
+# Calculate the start time for the last 30 days
+start_time_last_30_days = current_utc_time - timedelta(days=30)
+
+# Aggregation pipeline for the last 30 days
+pipeline_last_30_days = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time}
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$TimeStamp"}},
+            },
+            "total_male": {"$sum": "$TotalMale"},
+            "total_female": {"$sum": "$TotalFemale"}
+        }
+    },
+    {
+        "$sort": {"_id.date": 1}
+    }
+]
+
+# Execute the aggregation
+result_last_30_days = list(collection.aggregate(pipeline_last_30_days))
+
+# Extract the results
+daily_visit_trend = [{"date": entry["_id"]["date"], "total_male": entry["total_male"], "total_female": entry["total_female"]} for entry in result_last_30_days]
+
+# Create a JSON response
+json_response = {
+    "daily_visit_trend_last_30_days": daily_visit_trend
+}
+
+# Print the JSON response
+ic("******** DAILY VISIT TREND BY GENDER ********************")
+print(json_response)

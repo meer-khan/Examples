@@ -20,39 +20,8 @@ def create_db(client):
     except Exception as e:
         print(f"Error: {e}")
 
-# Create collections in the existing database
-
-
-# Create or access the specified database
-# db = client[database_name]
-# print(client.list_database_names())
-# UserID
-# Brand Name
-# Customer email address(User name)
-# Password
-# Location
-
-
-
-# DataID
-# UserID
-# Site ID
-# Timestamp
-# Number of people inside
-# Total trafic
-# Total male
-# Total female
-# Total kids
-
-# def add(cu,cs,cd):
-#     cu.insert_one({"UserID": 1, "BrandName": "Starbucks", "CustomerEmail": "example@gmail.com", "Password": "1234", "Location": "F-10, Islamabad" })
-#     cs.insert_one({"UserID": 1, "SiteID": "1_10", "Location": "F-9, Park, Islamabad" })
-#     cd.insert_one({"DataID": 1, "SiteID": "1_10", "UserID":1, "TimeStamp": datetime.now() , "NoOfPeople": "10", "Totaltrafic":"12",
-#                     "TotalMale": 2, "TotalFemale": 6, "TotalKids": 2 })
-
-
 def main():
-    client = MongoClient(f"mongodb://{config('HOST')}:{config('PORT')}/")
+    client = MongoClient(config("CONNMONGO"))
     cu,cs,cd = create_db(client)
     return cu,cs,cd
 
@@ -72,10 +41,16 @@ def get_one_user(cu, user_id):
         print(found_user)
         return None
 
-if __name__ == "__main__": 
-    client = MongoClient("mongodb://localhost:27017/")
-    cu,cs,cd = create_db(client)
-    result = add_site(cs, "25", "Islamabad")
-    ic(result)
-    # add(cu,cs,cd)
-    get_one_user(cu, ObjectId("6570de6b3ef211653f6f8fb9"))
+
+
+
+# def db_connnection():
+# # if __name__ == "__main__": 
+#     client = MongoClient("mongodb://localhost:27017/")
+#     cu,cs,cd = create_db(client)
+#     result = add_site(cs, "25", "Islamabad")
+#     ic(result)
+#     # add(cu,cs,cd)
+#     get_one_user(cu, ObjectId("6570de6b3ef211653f6f8fb9"))
+
+#     return cu,cs,cd

@@ -212,7 +212,7 @@ def avg_daily_visit():
 
 # ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
 
-def total_visits_in_last_12_months():
+def gender_trend_monthly_visits_for_last_12_months():
     current_utc_time = datetime.utcnow()
     start_time_last_12_months = current_utc_time - timedelta(days=365)
     pipeline_last_12_months = [
@@ -306,74 +306,13 @@ def gender_trend_30_days():
 
 
 
-
-# *********** Gender Distribution for last 7 hours *************** 
-
-def gender_trend_last_7_hours():
-    current_utc_time = datetime.utcnow()
-    start_time_last_7_hours = current_utc_time - timedelta(hours=7)
-    pipeline_last_7_hours = [
-        {
-            "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_hours, "$lt": current_utc_time}
-            }
-        },
-        {
-            "$project": {
-                "hour": {"$hour": "$TimeStamp"},
-                "total_male": "$TotalMale",
-                "total_female": "$TotalFemale",
-                "total_kids": "$TotalKids"
-            }
-        },
-        {
-            "$group": {
-                "_id": {"hour": "$hour"},
-                "total_male": {"$sum": "$total_male"},
-                "total_female": {"$sum": "$total_female"},
-                "total_kids": {"$sum": "$total_kids"}
-            }
-        },
-        {
-            "$sort": {"_id.hour": 1}
-        }
-    ]
-
-    # Execute the aggregation
-    result_last_7_hours = list(collection.aggregate(pipeline_last_7_hours))
-
-    # Extract the results
-    gender_distribution_last_7_hours = [
-        {
-            "hour": entry["_id"]["hour"],
-            "total_male": entry["total_male"],
-            "total_female": entry["total_female"],
-            "total_kids": entry["total_kids"]
-        } for entry in result_last_7_hours
-    ]
-
-    # Create a JSON response
-    json_response = {
-        "genderTrendLast7Hours": gender_distribution_last_7_hours
-    }
-
-    # Print the JSON response
-    ic("****************** TOTAL MALE AND FEMALE FOR LAST 7 HOURS ****************")
-    print(json_response)
-    return json_response
-
-
-
-
-
-
 # ************** Weekly total visitors trends for last 7 weeks ***************
 
 # Aggregation pipeline for the last 7 weeks
 
 def today_visit_in_last_7_weeks():
     current_utc_time = datetime.utcnow()
-    start_time_last_7_= current_utc_time - timedelta(hours=7)
+    start_time_last_7_weeks= current_utc_time - timedelta(hours=7)
     pipeline_last_7_weeks = [
         {
             "$match": {
@@ -522,5 +461,67 @@ def gender_trend_12_months():
 
     # Print the JSON response
     ic("********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************")
+    print(json_response)
+    return json_response
+
+
+
+
+
+
+
+
+# *********** Gender Distribution for last 7 hours *************** 
+
+def gender_trend_last_7_hours():
+    current_utc_time = datetime.utcnow()
+    start_time_last_7_hours = current_utc_time - timedelta(hours=7)
+    pipeline_last_7_hours = [
+        {
+            "$match": {
+                "TimeStamp": {"$gte": start_time_last_7_hours, "$lt": current_utc_time}
+            }
+        },
+        {
+            "$project": {
+                "hour": {"$hour": "$TimeStamp"},
+                "total_male": "$TotalMale",
+                "total_female": "$TotalFemale",
+                "total_kids": "$TotalKids"
+            }
+        },
+        {
+            "$group": {
+                "_id": {"hour": "$hour"},
+                "total_male": {"$sum": "$total_male"},
+                "total_female": {"$sum": "$total_female"},
+                "total_kids": {"$sum": "$total_kids"}
+            }
+        },
+        {
+            "$sort": {"_id.hour": 1}
+        }
+    ]
+
+    # Execute the aggregation
+    result_last_7_hours = list(collection.aggregate(pipeline_last_7_hours))
+
+    # Extract the results
+    gender_distribution_last_7_hours = [
+        {
+            "hour": entry["_id"]["hour"],
+            "total_male": entry["total_male"],
+            "total_female": entry["total_female"],
+            "total_kids": entry["total_kids"]
+        } for entry in result_last_7_hours
+    ]
+
+    # Create a JSON response
+    json_response = {
+        "genderTrendLast7Hours": gender_distribution_last_7_hours
+    }
+
+    # Print the JSON response
+    ic("****************** TOTAL MALE AND FEMALE FOR LAST 7 HOURS ****************")
     print(json_response)
     return json_response

@@ -17,7 +17,8 @@ start_time_previous_24_hours = start_time_last_24_hours - timedelta(hours=24)
 start_time_last_7_days = current_utc_time - timedelta(days=7)
 start_time_previous_7_days = start_time_last_7_days - timedelta(days=7)
 
-
+def today_total_visit():
+    pass
 
 
 # Aggregation pipeline for the last 24 hours
@@ -48,6 +49,11 @@ pipeline_previous_24_hours = [
         }
     }
 ]
+
+
+
+def last_7_days_total_visit():
+    pass
 
 # Aggregation pipeline for the last 7 days
 pipeline_last_7_days = [
@@ -108,6 +114,9 @@ print("Visitor Count Previous 7 Days:", user_count_previous_7_days)
 # Calculate the start time for the current day
 start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
 
+def today_male_female_kids_ratio():
+    pass
+
 # Aggregation pipeline for the current day
 pipeline_current_day = [
     {
@@ -144,7 +153,8 @@ print("Total Kids on Current Day:", total_kids_current_day)
 
 
 
-
+def avg_hourly_visits():
+    pass
 
 pipeline_avg_hourly_visitors = [
     {
@@ -182,7 +192,8 @@ print(json_response)
 
 
 
-
+def avg_daily_visit():
+    pass
 
 # Aggregation pipeline for average daily visitors
 pipeline_avg_daily_visitors = [
@@ -227,6 +238,10 @@ print(json_response)
 # ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
 current_utc_time = datetime.utcnow()
 start_time_last_12_months = current_utc_time - timedelta(days=365)
+
+
+def total_visits_in_last_12_months():
+    pass
 
 # Aggregation pipeline for the last 12 months
 pipeline_last_12_months = [
@@ -281,6 +296,8 @@ current_utc_time = datetime.utcnow()
 start_time_last_30_days = current_utc_time - timedelta(days=30)
 
 # Aggregation pipeline for the last 30 days
+
+
 pipeline_last_30_days = [
     {
         "$match": {

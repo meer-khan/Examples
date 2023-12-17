@@ -16,6 +16,10 @@ app = Flask(__name__)
 cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, r"/addusers/": {"origins": config("ORIGIN")}})
 
 
+@app.route("/analytics/total_visits/", methods= ["GET"])
+def total_visits(): 
+    pass
+
 
 
 @app.route('/addusers/',methods=["POST"])
@@ -60,6 +64,7 @@ def user():
         data = request.json
         user_id = data.get("userID")
         location = data.get("location")
+        total_capacity = data.get("total_capacity")
         no_of_people = data.get("noOfPeople")
         total_traffic = data.get("totalTraffic")
         total_male = data.get("totalMale")
@@ -75,7 +80,7 @@ def user():
         try: 
             user = dbquery.get_one_user(cu,user_id)
             if user:
-                site_id = dbquery.add_site(cs, user_id, location)
+                site_id = dbquery.add_site(cs, user_id, location, total_capacity)
                 dbquery.add_data(cd,site_id,user_id,no_of_people,total_traffic,total_male,total_female, total_kids)
                 result = {"msg":"data added successfully"}
                 return make_response(jsonify(result), 201)

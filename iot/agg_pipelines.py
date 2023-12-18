@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 from icecream import ic
+
 # Connect to MongoDB
 # client = MongoClient("mongodb://localhost:27017/")
 # db = client["CoffeeShop"]
-# collection = db["Data"]
+# cd = db["Data"]
 
 def total_visit_last_24_hours(collection):
     current_utc_time = datetime.utcnow()
@@ -476,3 +477,22 @@ def gender_trend_last_7_hours(collection):
     ic("****************** TOTAL MALE AND FEMALE FOR LAST 7 HOURS ****************")
     print(json_response)
     return json_response
+
+
+
+
+
+# total_visit_last_24_hours(cd)
+# total_visit_last_7_days(cd)
+# male_female_kids_count_today(cd)
+
+# avg_hourly_visits(cd)
+# avg_daily_visit(cd)
+
+# gender_trend_30_days(cd)
+# gender_trend_last_7_weeks(cd)
+# gender_trend_12_months(cd)
+
+# gender_trend_monthly_visits_for_last_12_months(cd)
+# gender_trend_last_7_hours(cd)
+

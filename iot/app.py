@@ -11,6 +11,7 @@ from icecream import ic
 import db, dbquery
 from bson import json_util
 import agg_pipelines
+import authentication
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
 cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, 
@@ -22,9 +23,17 @@ cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")},
                                  })
 
 
-
 @app.route("/analytics/avg_gender_trends/", methods= ["GET"])
-def avg_gender_trends(): 
+def avg_gender_trends():
+    header = request.headers
+    token = header.get("Authorization")
+    if token != None: 
+        result = authentication.verify_token(token)
+        if result == False: 
+            return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    else:
+        return make_response(jsonify({"error": "Authentication Failed"}), 401)
+     
     g_t_12m = agg_pipelines.gender_trend_monthly_visits_for_last_12_months(cd)
     g_7h = agg_pipelines.gender_trend_last_7_hours(cd)
 
@@ -36,6 +45,15 @@ def avg_gender_trends():
 
 @app.route("/analytics/gender_trends/", methods= ["GET"])
 def gender_trends(): 
+    header = request.headers
+    token = header.get("Authorization")
+    if token != None: 
+        result = authentication.verify_token(token)
+        if result == False: 
+            return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    else:
+        return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    
     g_30d = agg_pipelines.gender_trend_30_days(cd)
     g_7w = agg_pipelines.gender_trend_last_7_weeks(cd)
     g_12m = agg_pipelines.gender_trend_12_months(cd)
@@ -51,6 +69,15 @@ def gender_trends():
 
 @app.route("/analytics/average_visits/", methods= ["GET"])
 def average_visits(): 
+    header = request.headers
+    token = header.get("Authorization")
+    if token != None: 
+        result = authentication.verify_token(token)
+        if result == False: 
+            return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    else:
+        return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    
     a_h = agg_pipelines.avg_hourly_visits(cd)
     a_d = agg_pipelines.avg_daily_visit(cd)
 
@@ -63,15 +90,27 @@ def average_visits():
 
 @app.route("/analytics/total_visits/", methods= ["GET"])
 def total_visits(): 
-    t_24h = agg_pipelines.total_visit_last_24_hours(cd)
-    t_7d = agg_pipelines.total_visit_last_7_days(cd)
-    c_t = agg_pipelines.male_female_kids_count_today(cd)
+    try:
+        header = request.headers
+        token = header.get("Authorization")
+        if token != None: 
+            result = authentication.verify_token(token)
+            if result == False: 
+                return make_response(jsonify({"error": "Authentication Failed"}), 401)
+        else:
+            return make_response(jsonify({"error": "Authentication Failed"}), 401)
+        
+        t_24h = agg_pipelines.total_visit_last_24_hours(cd)
+        t_7d = agg_pipelines.total_visit_last_7_days(cd)
+        c_t = agg_pipelines.male_female_kids_count_today(cd)
 
-    t_24h.update(t_7d)
-    t_24h.update(c_t)
+        t_24h.update(t_7d)
+        t_24h.update(c_t)
 
-    result = json.dumps(t_24h)
-    return make_response(result,200)
+        result = json.dumps(t_24h)
+        return make_response(result,200)
+    except Exception as ex: 
+        return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
 
 
 

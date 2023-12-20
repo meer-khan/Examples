@@ -14,12 +14,17 @@ import agg_pipelines
 import authentication
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
-cors = CORS(app, resources={r"/users/": {"origins": config("ORIGIN")}, 
-                             r"/addusers/": {"origins": config("ORIGIN")},
-                              r"/analytics/total_visits/": {"origins": config("ORIGIN")},
-                               r"/analytics/average_visits/": {"origins": config("ORIGIN")},
-                                r"/analytics/gender_trends/": {"origins": config("ORIGIN")},
-                                 r"/analytics/avg_gender_trends/": {"origins": config("ORIGIN")}
+allowed_origins = config("ORIGIN", default="").split(',')
+ic(allowed_origins)
+# Enable CORS for all routes that match the specified path
+# cors = CORS(app, resources={r"/users/": {"origins": allowed_origins}})
+
+cors = CORS(app, resources={r"/users/": {"origins": allowed_origins}, 
+                             r"/addusers/": {"origins": allowed_origins},
+                              r"/analytics/total_visits/": {"origins": allowed_origins},
+                               r"/analytics/average_visits/": {"origins": allowed_origins},
+                                r"/analytics/gender_trends/": {"origins": allowed_origins},
+                                 r"/analytics/avg_gender_trends/": {"origins": allowed_origins}
                                  })
 
 
@@ -102,7 +107,7 @@ def total_visits():
         
         t_24h = agg_pipelines.total_visit_last_24_hours(cd)
         t_7d = agg_pipelines.total_visit_last_7_days(cd)
-        c_t = agg_pipelines.male_female_kids_count_today(cd)
+        c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(cd)
 
         t_24h.update(t_7d)
         t_24h.update(c_t)
@@ -189,7 +194,7 @@ def user():
 if __name__ == "__main__":
     cu,cs,cd = db.main()
     if config("MODE") == 'DEV':
-        app.run(host='localhost', debug=True, port=5000)
+        app.run(host='0.0.0.0', debug=True, port=5000)
     if config("MODE") == 'PROD':
         serve(app, host = '0.0.0.0', port=5000, threads = 4)
         

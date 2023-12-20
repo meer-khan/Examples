@@ -104,42 +104,138 @@ def total_visit_last_7_days(collection):
 
 
 
-def male_female_kids_count_today(collection):
+# def male_female_kids_count_today(collection):
+#     current_utc_time = datetime.utcnow()
+#     start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
+#     pipeline_current_day = [
+#         {
+#             "$match": {
+#                 "TimeStamp": {"$gte": start_time_current_day, "$lt": current_utc_time}
+#             }
+#         },
+#         {
+#             "$group": {
+#                 "_id": None,
+#                 "total_male_current_day": {"$sum": "$TotalMale"},
+#                 "total_female_current_day": {"$sum": "$TotalFemale"},
+#                 "total_kids_current_day": {"$sum": "$TotalKids"}
+#             }
+#         }
+#     ]
+
+#     result_current_day = list(collection.aggregate(pipeline_current_day))
+#     total_male_current_day = result_current_day[0]["total_male_current_day"] if result_current_day else 0
+#     total_female_current_day = result_current_day[0]["total_female_current_day"] if result_current_day else 0
+#     total_kids_current_day = result_current_day[0]["total_kids_current_day"] if result_current_day else 0
+
+#     print("Total Male on Current Day:", total_male_current_day)
+#     print("Total Female on Current Day:", total_female_current_day)
+#     print("Total Kids on Current Day:", total_kids_current_day)
+
+#     json_response={
+#         "todayMaleCount":total_male_current_day,
+#         "todayFemaleCount": total_female_current_day,
+#         "todayKidsCount": total_kids_current_day
+#     }
+
+#     return  json_response
+
+
+
+def total_male_female_kids_count_24h7d30d(collection):
     current_utc_time = datetime.utcnow()
-    start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-    pipeline_current_day = [
+    # Calculate the start time for the last 24 hours
+    start_time_last_24_hours = current_utc_time - timedelta(hours=24)
+
+    # Aggregation pipeline for the last 24 hours
+    pipeline_last_24_hours = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_current_day, "$lt": current_utc_time}
+                "TimeStamp": {"$gte": start_time_last_24_hours, "$lt": current_utc_time}
             }
         },
         {
             "$group": {
                 "_id": None,
-                "total_male_current_day": {"$sum": "$TotalMale"},
-                "total_female_current_day": {"$sum": "$TotalFemale"},
-                "total_kids_current_day": {"$sum": "$TotalKids"}
+                "total_male": {"$sum": "$TotalMale"},
+                "total_female": {"$sum": "$TotalFemale"},
+                "total_kids": {"$sum": "$TotalKids"}
             }
         }
     ]
 
-    result_current_day = list(collection.aggregate(pipeline_current_day))
-    total_male_current_day = result_current_day[0]["total_male_current_day"] if result_current_day else 0
-    total_female_current_day = result_current_day[0]["total_female_current_day"] if result_current_day else 0
-    total_kids_current_day = result_current_day[0]["total_kids_current_day"] if result_current_day else 0
+    # Execute the aggregation
+    result_last_24_hours = list(collection.aggregate(pipeline_last_24_hours))
 
-    print("Total Male on Current Day:", total_male_current_day)
-    print("Total Female on Current Day:", total_female_current_day)
-    print("Total Kids on Current Day:", total_kids_current_day)
+    # Print the result
+    print(result_last_24_hours)
 
-    json_response={
-        "todayMaleCount":total_male_current_day,
-        "todayFemaleCount": total_female_current_day,
-        "todayKidsCount": total_kids_current_day
-    }
 
-    return  json_response
 
+
+    # Calculate the start time for the last 7 days
+    start_time_last_7_days = current_utc_time - timedelta(days=7)
+
+    # Aggregation pipeline for the last 7 days
+    pipeline_last_7_days = [
+        {
+            "$match": {
+                "TimeStamp": {"$gte": start_time_last_7_days, "$lt": current_utc_time}
+            }
+        },
+        {
+            "$group": {
+                "_id": None,
+                "total_male": {"$sum": "$TotalMale"},
+                "total_female": {"$sum": "$TotalFemale"},
+                "total_kids": {"$sum": "$TotalKids"}
+            }
+        }
+    ]
+
+    # Execute the aggregation
+    result_last_7_days = list(collection.aggregate(pipeline_last_7_days))
+
+    # Print the result
+    print(result_last_7_days)
+
+
+
+
+    # Calculate the start time for the last 30 days
+    start_time_last_30_days = current_utc_time - timedelta(days=30)
+
+    # Aggregation pipeline for the last 30 days
+    pipeline_last_30_days = [
+        {
+            "$match": {
+                "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time}
+            }
+        },
+        {
+            "$group": {
+                "_id": None,
+                "total_male": {"$sum": "$TotalMale"},
+                "total_female": {"$sum": "$TotalFemale"},
+                "total_kids": {"$sum": "$TotalKids"}
+            }
+        }
+    ]
+
+    # Execute the aggregation
+    result_last_30_days = list(collection.aggregate(pipeline_last_30_days))
+
+    # Print the result
+    # print(result_last_30_days)
+
+    result_last_7_days[0].pop("_id")
+    result_last_24_hours[0].pop("_id")
+    result_last_30_days[0].pop("_id")
+
+    # print("____________________-")
+    result = {"total_m_f_k_24h": result_last_24_hours[0], "total_m_f_k_7d": result_last_7_days[0], "total_m_f_k_30d": result_last_30_days[0]}
+    # print(result)
+    return result
 
 def avg_hourly_visits(collection):
     pipeline_avg_hourly_visitors = [

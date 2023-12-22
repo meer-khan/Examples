@@ -3,9 +3,9 @@ from pymongo import MongoClient
 from icecream import ic
 
 # Connect to MongoDB
-# client = MongoClient("mongodb://localhost:27017/")
-# db = client["CoffeeShop"]
-# cd = db["Data"]
+client = MongoClient("mongodb://localhost:27017/")
+db = client["CoffeeShop"]
+cd = db["Data"]
 
 def total_visit_last_24_hours(collection):
     current_utc_time = datetime.utcnow()
@@ -267,10 +267,29 @@ def avg_hourly_visits(collection):
         "avgHourlyVisits": average_hourly_visitors
     }
 
-    print(json_response)
+    # print(json_response)
     return json_response
 
 
+def busiest_hour_2h_interval(collection):
+    # Aggregation pipeline for average NoOfPeople for each 2-hour interval
+    result = avg_hourly_visits(collection)
+    result = result["avgHourlyVisits"]
+    
+    hourly_sum = {i: 0 for i in range(1, 13)}
+
+    # Process the result and sum consecutive hours
+    for entry in result:
+        # The key represents the hour divided by 2 (e.g., 1, 2, ..., 12)
+        key = (entry['hour'] - 1) // 2 + 1
+        hourly_sum[key] += entry['average_visitors']
+
+    # Generate the final result with 12 hours
+    final_result = [{'hour': i, 'total_average_visitors': hourly_sum[i]} for i in range(1, 13)]
+    json_response = {"busiestHours2hInterval":final_result}
+    print(json_response)
+    return json_response
+# busiest_hour_2h_interval(cd)
 
 def avg_daily_visit(collection):
     pipeline_avg_daily_visitors = [
@@ -575,20 +594,4 @@ def gender_trend_last_7_hours(collection):
     return json_response
 
 
-
-
-
-# total_visit_last_24_hours(cd)
-# total_visit_last_7_days(cd)
-# male_female_kids_count_today(cd)
-
-# avg_hourly_visits(cd)
-# avg_daily_visit(cd)
-
-# gender_trend_30_days(cd)
-# gender_trend_last_7_weeks(cd)
-# gender_trend_12_months(cd)
-
-# gender_trend_monthly_visits_for_last_12_months(cd)
-# gender_trend_last_7_hours(cd)
 

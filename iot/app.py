@@ -85,8 +85,9 @@ def average_visits():
     
     a_h = agg_pipelines.avg_hourly_visits(cd)
     a_d = agg_pipelines.avg_daily_visit(cd)
-
+    busiest_hour = agg_pipelines.busiest_hour_2h_interval(cd)
     a_h.update(a_d)
+    a_h.update(busiest_hour)
 
     result = json.dumps(a_h)
     return make_response(result,200)

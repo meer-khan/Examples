@@ -10,7 +10,7 @@ from waitress import serve
 from icecream import ic
 import db, dbquery
 from bson import json_util
-import agg_pipelines
+import agg_pipelines, agg_pipeline_add
 import authentication
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
@@ -106,8 +106,8 @@ def total_visits():
         else:
             return make_response(jsonify({"error": "Authentication Failed"}), 401)
         
-        t_24h = agg_pipelines.total_visit_last_24_hours(cd)
-        t_7d = agg_pipelines.total_visit_last_7_days(cd)
+        t_24h = agg_pipeline_add.hourly_visits_last_24h(cd)
+        t_7d = agg_pipeline_add.calculate_daily_visits_for_last_7d(cd)
         c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(cd)
 
         t_24h.update(t_7d)

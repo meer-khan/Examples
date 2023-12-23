@@ -3,9 +3,9 @@ from pymongo import MongoClient
 from icecream import ic
 
 # Connect to MongoDB
-client = MongoClient("mongodb://localhost:27017/")
-db = client["CoffeeShop"]
-cd = db["Data"]
+# client = MongoClient("mongodb://localhost:27017/")
+# db = client["CoffeeShop"]
+# cd = db["Data"]
 
 def total_visit_last_24_hours(collection):
     current_utc_time = datetime.utcnow()
@@ -345,7 +345,8 @@ def gender_trend_30_days(collection):
                     "date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$TimeStamp"}},
                 },
                 "total_male": {"$sum": "$TotalMale"},
-                "total_female": {"$sum": "$TotalFemale"}
+                "total_female": {"$sum": "$TotalFemale"},
+                "total_kids": {"$sum": "$TotalKids"}
             }
         },
         {
@@ -357,7 +358,7 @@ def gender_trend_30_days(collection):
     result_last_30_days = list(collection.aggregate(pipeline_last_30_days))
 
     # Extract the results
-    daily_visit_trend = [{"date": entry["_id"]["date"], "total_male": entry["total_male"], "total_female": entry["total_female"]} for entry in result_last_30_days]
+    daily_visit_trend = [{"date": entry["_id"]["date"], "total_male": entry["total_male"], "total_female": entry["total_female"],"total_kids": entry["total_kids"] } for entry in result_last_30_days]
 
     # Create a JSON response
     json_response = {
@@ -391,14 +392,16 @@ def gender_trend_last_7_weeks(collection):
             "$project": {
                 "week": {"$week": "$TimeStamp"},
                 "total_male": "$TotalMale",
-                "total_female": "$TotalFemale"
+                "total_female": "$TotalFemale",
+                "total_kids": "$TotalKids",
             }
         },
         {
             "$group": {
                 "_id": {"week": "$week"},
                 "total_male": {"$sum": "$total_male"},
-                "total_female": {"$sum": "$total_female"}
+                "total_female": {"$sum": "$total_female"},
+                "total_kids": {"$sum": "$total_kids"},
             }
         },
         {
@@ -414,7 +417,9 @@ def gender_trend_last_7_weeks(collection):
         {
             "week": entry["_id"]["week"],
             "total_male": entry["total_male"],
-            "total_female": entry["total_female"]
+            "total_female": entry["total_female"],
+            "total_kids": entry["total_kids"],
+
         } for entry in result_last_7_weeks_gender
     ]
 
@@ -448,14 +453,16 @@ def gender_trend_12_months(collection):
             "$project": {
                 "month": {"$month": "$TimeStamp"},
                 "total_male": "$TotalMale",
-                "total_female": "$TotalFemale"
+                "total_female": "$TotalFemale",
+                "total_kids": "$TotalKids",
             }
         },
         {
             "$group": {
                 "_id": {"month": "$month"},
                 "total_male": {"$sum": "$total_male"},
-                "total_female": {"$sum": "$total_female"}
+                "total_female": {"$sum": "$total_female"},
+                "total_kids": {"$sum": "$total_kids"},
             }
         },
         {
@@ -465,13 +472,14 @@ def gender_trend_12_months(collection):
 
     # Execute the aggregation
     result_last_12_months_gender = list(collection.aggregate(pipeline_last_12_months_gender))
-
+    ic(result_last_12_months_gender)
     # Extract the results
     monthly_gender_visit_trend = [
         {
             "month": entry["_id"]["month"],
             "total_male": entry["total_male"],
-            "total_female": entry["total_female"]
+            "total_female": entry["total_female"],
+            "total_kids": entry["total_kids"],
         } for entry in result_last_12_months_gender
     ]
 

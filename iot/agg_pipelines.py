@@ -168,7 +168,7 @@ def total_male_female_kids_count_24h7d30d(collection):
     result_last_24_hours = list(collection.aggregate(pipeline_last_24_hours))
 
     # Print the result
-    print(result_last_24_hours)
+    ic(result_last_24_hours)
 
 
 
@@ -197,7 +197,7 @@ def total_male_female_kids_count_24h7d30d(collection):
     result_last_7_days = list(collection.aggregate(pipeline_last_7_days))
 
     # Print the result
-    print(result_last_7_days)
+    ic(result_last_7_days)
 
 
 
@@ -226,14 +226,18 @@ def total_male_female_kids_count_24h7d30d(collection):
     result_last_30_days = list(collection.aggregate(pipeline_last_30_days))
 
     # Print the result
-    # print(result_last_30_days)
-
-    result_last_7_days[0].pop("_id")
-    result_last_24_hours[0].pop("_id")
-    result_last_30_days[0].pop("_id")
+    ic(result_last_30_days)
+    if len(result_last_7_days) > 0:
+        result_last_7_days[0].pop("_id")
+    if len(result_last_24_hours) > 0:
+        result_last_24_hours[0].pop("_id")
+    if len(result_last_30_days) > 0:
+        result_last_30_days[0].pop("_id")
 
     # print("____________________-")
-    result = {"total_m_f_k_24h": result_last_24_hours[0], "total_m_f_k_7d": result_last_7_days[0], "total_m_f_k_30d": result_last_30_days[0]}
+    result = {"total_m_f_k_24h": result_last_24_hours[0] if len(result_last_24_hours) >0 else [], 
+              "total_m_f_k_7d": result_last_7_days[0] if len(result_last_7_days) >0 else [], 
+              "total_m_f_k_30d": result_last_30_days[0] if len(result_last_30_days) >0 else []}
     # print(result)
     return result
 
@@ -271,18 +275,23 @@ def avg_hourly_visits(collection):
     return json_response
 
 
+
 def busiest_hour_2h_interval(collection):
     # Aggregation pipeline for average NoOfPeople for each 2-hour interval
     result = avg_hourly_visits(collection)
     result = result["avgHourlyVisits"]
-    
+    # print(result)
     hourly_sum = {i: 0 for i in range(1, 13)}
-
+    # ic(hourly_sum)
     # Process the result and sum consecutive hours
     for entry in result:
         # The key represents the hour divided by 2 (e.g., 1, 2, ..., 12)
-        key = (entry['hour'] - 1) // 2 + 1
-        hourly_sum[key] += entry['average_visitors']
+        ic(entry["hour"])
+        if entry['hour'] != None:
+            key = (entry['hour'] - 1) // 2 + 1
+            # ic(key)
+            # ic(entry["average_visitors"])
+            hourly_sum[key] = entry['average_visitors']
 
     # Generate the final result with 12 hours
     final_result = [{'hour': i, 'total_average_visitors': hourly_sum[i]} for i in range(1, 13)]
@@ -305,11 +314,11 @@ def avg_daily_visit(collection):
     ]
 
     result_avg_daily_visitors = list(collection.aggregate(pipeline_avg_daily_visitors))
-
-    average_daily_visitors = [{"day_of_week": entry["_id"], "average_visitors": entry["average_daily_visitors"]} for entry in result_avg_daily_visitors]
+    ic(result_avg_daily_visitors)
+    average_daily_visitors = [{"day_of_week": en["_id"], "average_visitors": en["average_daily_visitors"]} for en in result_avg_daily_visitors if en["_id"] != None ]
 
     day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    average_daily_visitors_mapped = [{day_names[entry["day_of_week"] - 1]: entry["average_visitors"]} for entry in average_daily_visitors]
+    average_daily_visitors_mapped = [{day_names[en["day_of_week"] - 1]: en["average_visitors"]} for en in average_daily_visitors]
 
     # Create a JSON response
     json_response = {

@@ -16,14 +16,17 @@ def create_db(client):
         collection_users = existing_db["Users"]
         collection_sites = existing_db["Sites"]
         collection_data = existing_db["Data"]
-        return collection_users,collection_sites,collection_data
+        collection_processed_data = existing_db["ProcessedData"]
+
+        return collection_users,collection_sites,collection_data, collection_processed_data
     except Exception as e:
         print(f"Error: {e}")
 
 def main():
     client = MongoClient(config("CONNMONGO"))
-    cu,cs,cd = create_db(client)
-    return cu,cs,cd
+    cu,cs,cd,cpd = create_db(client)
+    return cu,cs,cd, cpd
+
 
 
 def add_site(cs, user_id,  location):

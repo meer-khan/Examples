@@ -21,6 +21,10 @@ def add_data(cd,site_id,user_id,no_of_people, total_traffic, total_male, total_f
     # utc_time = local_time.astimezone(pytz.utc)
     cd.insert_one({"DataID": 1, "SiteID": site_id, "UserID":user_id, "TimeStamp": datetime.utcnow() , "NoOfPeople": no_of_people, "Totaltrafic":total_traffic,
                     "TotalMale": total_male, "TotalFemale": total_female, "TotalKids": total_kids })
+    
+def add_processed_data(cpd, total_traffic, total_male, total_female, total_kids, sa_time):
+    cpd.insert_one({"TimeStamp": datetime.utcnow() , "TotalTraffic":total_traffic,
+                    "TotalMale": total_male, "TotalFemale": total_female, "TotalKids": total_kids, "SaudiTime": sa_time })
 
 def get_one_user(cu, user_id):
     ic(user_id)

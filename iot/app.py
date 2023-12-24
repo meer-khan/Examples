@@ -85,12 +85,18 @@ def average_visits():
     
     a_h = agg_pipelines.avg_hourly_visits(cd)
     a_d = agg_pipelines.avg_daily_visit(cd)
+    # result= agg_pipelines.avg_hourly_visits(cd)
+    # print("********************")
+    # print(result)
     busiest_hour = agg_pipelines.busiest_hour_2h_interval(cd)
     a_h.update(a_d)
     a_h.update(busiest_hour)
 
     result = json.dumps(a_h)
     return make_response(result,200)
+
+
+
 
 
 
@@ -105,10 +111,15 @@ def total_visits():
                 return make_response(jsonify({"error": "Authentication Failed"}), 401)
         else:
             return make_response(jsonify({"error": "Authentication Failed"}), 401)
-        
+        # print(cursor:=cd.find())
+        # for cur in cursor:
+        #     print(cur)
         t_24h = agg_pipeline_add.hourly_visits_last_24h(cd)
+        ic(t_24h)
         t_7d = agg_pipeline_add.calculate_daily_visits_for_last_7d(cd)
+        ic(t_7d)
         c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(cd)
+        ic(c_t)
 
         t_24h.update(t_7d)
         t_24h.update(c_t)
@@ -117,6 +128,28 @@ def total_visits():
         return make_response(result,200)
     except Exception as ex: 
         return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
+
+
+
+@app.route("/daily_data/", methods= ["POST"])
+def daily_data(): 
+    try:
+        data = request.json
+        total_traffic = data.get("totalTraffic")
+        total_male = data.get("totalMale")
+        total_female = data.get("totalFemale")
+        total_kids = data.get("totalKids")
+        time_stamp = data.get("timeStamp")
+        if total_traffic is None or total_male is None or total_female is None or total_kids is None: 
+            result = {"error": "fields should not be none"}
+            return make_response(jsonify(result), 400)
+        dbquery.add_processed_data(cpd,total_traffic,total_male,total_female, total_kids,time_stamp)
+        result = {"msg":"data added successfully"}
+        return make_response(result,200)
+    except Exception as ex: 
+        return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
+
+
 
 
 
@@ -193,7 +226,7 @@ def user():
 
 
 if __name__ == "__main__":
-    cu,cs,cd = db.main()
+    cu,cs,cd,cpd = db.main()
     if config("MODE") == 'DEV':
         app.run(host='0.0.0.0', debug=True, port=5000)
     if config("MODE") == 'PROD':

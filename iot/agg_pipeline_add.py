@@ -42,14 +42,6 @@ def hourly_visits_last_24h(collection):
 
     formatted_result = [{"hour": entry["_id"]["hour"], "NoOfPeople": entry["NoOfPeople"]} for entry in result_hourly_visits]
 
-        # Convert formatted result to JSON
-    # json_result = json.dumps(formatted_result, default=str)
-    # Convert result to JSON
-    # json_result = json.dumps(result_hourly_visits, default=str)
-
-    # return json_result/
-
-    # Convert the result to JSON
     json_response = {"hourlyVisits": formatted_result}
     # print(json_result)
     return json_response

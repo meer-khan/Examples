@@ -39,7 +39,7 @@ def avg_gender_trends():
     else:
         return make_response(jsonify({"error": "Authentication Failed"}), 401)
      
-    g_t_12m = agg_pipelines.gender_trend_monthly_visits_for_last_12_months(cd)
+    g_t_12m = agg_pipelines.monthly_visitors_count(cd)
     g_7h = agg_pipelines.gender_trend_last_7_hours(cd)
 
     g_t_12m.update(g_7h)
@@ -85,14 +85,14 @@ def average_visits():
     
     # a_h = agg_pipelines.avg_hourly_visits(cd)
     # a_d = agg_pipelines.avg_daily_visit(cd)
-    t_24h = agg_pipeline_add.hourly_visits_last_24h(cd)
+    t_24h = agg_pipelines.hourly_visits_last_24h(cd)
     # ic(t_24h)
-    t_7d = agg_pipeline_add.calculate_daily_visits_for_last_7d(cd)
+    t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(cd)
     ic(t_7d)
     # result= agg_pipelines.avg_hourly_visits(cd)
     # print("********************")
     # print(result)
-    busiest_hour = agg_pipelines.busiest_hour_2h_interval(cd)
+    busiest_hour = agg_pipelines.busiest_hour_7_days(cd)
     t_24h.update(t_7d)
     t_24h.update(busiest_hour)
 
@@ -119,9 +119,8 @@ def total_visits():
         # for cur in cursor:
         #     print(cur)
         t_24h = agg_pipelines.total_visit_last_24_hours(cd)
-        # t_24h = agg_pipeline_add.hourly_visits_last_24h(cd)
+        ic(t_24h)
         t_7d = agg_pipelines.total_visit_last_7_days(cd)
-
         ic(t_7d)
         c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(cd)
         ic(c_t)

@@ -407,7 +407,7 @@ def busiest_hour_7_days(collection):
             date_visits[date] = sorted_hourly_visits
     
     sa_hour_convertion = {}
-    for key,value in result[0].items():
+    for key,value in result[0].items(): 
         sa_hour_convertion.update({key:[]})
         
         for hour_visit_dict in value:

@@ -6,13 +6,13 @@ from icecream import ic
 # client = MongoClient("mongodb://localhost:27017/")
 # db = client["CoffeeShop"]
 # cd = db["Data"]
-
 def total_visit_last_24_hours(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_24_hours = current_utc_time - timedelta(hours=24)
     start_time_previous_24_hours = start_time_last_24_hours - timedelta(hours=24)
         
     pipeline_last_24_hours = [
+        
         {
             "$match": {
                 "TimeStamp": {"$gte": start_time_last_24_hours, "$lt": current_utc_time}
@@ -21,7 +21,7 @@ def total_visit_last_24_hours(collection):
         {
             "$group": {
                 "_id": None,
-                "user_count_last_24_hours": {"$sum": "$NoOfPeople"}
+                "user_count_last_24_hours": {"$sum": "$Totaltrafic"}
             }
         }
     ]
@@ -35,23 +35,30 @@ def total_visit_last_24_hours(collection):
         {
             "$group": {
                 "_id": None,
-                "user_count_previous_24_hours": {"$sum": "$NoOfPeople"}
+                "user_count_previous_24_hours": {"$sum": "$Totaltrafic"}
             }
         }
     ]
 
     result_last_24_hours = list(collection.aggregate(pipeline_last_24_hours))
     result_previous_24_hours = list(collection.aggregate(pipeline_previous_24_hours))
+
+    
     user_count_last_24_hours = result_last_24_hours[0]["user_count_last_24_hours"] if result_last_24_hours else 0
     user_count_previous_24_hours = result_previous_24_hours[0]["user_count_previous_24_hours"] if result_previous_24_hours else 0
     user_count_difference = user_count_last_24_hours - user_count_previous_24_hours
     print("Visitor Count Last 24 Hours:", user_count_last_24_hours)
-    print("Visitor Count Difference 24 Hours:", user_count_difference)
+    print("Visitor Count Difference 24 Hours:", user_count_previous_24_hours)
     json_response = {
         "visitorLast24Hour":user_count_last_24_hours,
         "visitorPrevious24Hour": user_count_previous_24_hours
     }
     return json_response
+
+
+
+
+
 
 
 
@@ -68,7 +75,7 @@ def total_visit_last_7_days(collection):
         {
             "$group": {
                 "_id": None,
-                "user_count_last_7_days": {"$sum": "$NoOfPeople"}
+                "user_count_last_7_days": {"$sum": "$Totaltrafic"}
             }
         }
     ]
@@ -82,7 +89,7 @@ def total_visit_last_7_days(collection):
         {
             "$group": {
                 "_id": None,
-                "user_count_previous_7_days": {"$sum": "$NoOfPeople"}
+                "user_count_previous_7_days": {"$sum": "$Totaltrafic"}
             }
         }
     ]
@@ -104,41 +111,10 @@ def total_visit_last_7_days(collection):
 
 
 
-# def male_female_kids_count_today(collection):
-#     current_utc_time = datetime.utcnow()
-#     start_time_current_day = current_utc_time.replace(hour=0, minute=0, second=0, microsecond=0)
-#     pipeline_current_day = [
-#         {
-#             "$match": {
-#                 "TimeStamp": {"$gte": start_time_current_day, "$lt": current_utc_time}
-#             }
-#         },
-#         {
-#             "$group": {
-#                 "_id": None,
-#                 "total_male_current_day": {"$sum": "$TotalMale"},
-#                 "total_female_current_day": {"$sum": "$TotalFemale"},
-#                 "total_kids_current_day": {"$sum": "$TotalKids"}
-#             }
-#         }
-#     ]
 
-#     result_current_day = list(collection.aggregate(pipeline_current_day))
-#     total_male_current_day = result_current_day[0]["total_male_current_day"] if result_current_day else 0
-#     total_female_current_day = result_current_day[0]["total_female_current_day"] if result_current_day else 0
-#     total_kids_current_day = result_current_day[0]["total_kids_current_day"] if result_current_day else 0
 
-#     print("Total Male on Current Day:", total_male_current_day)
-#     print("Total Female on Current Day:", total_female_current_day)
-#     print("Total Kids on Current Day:", total_kids_current_day)
 
-#     json_response={
-#         "todayMaleCount":total_male_current_day,
-#         "todayFemaleCount": total_female_current_day,
-#         "todayKidsCount": total_kids_current_day
-#     }
 
-#     return  json_response
 
 
 
@@ -238,107 +214,218 @@ def total_male_female_kids_count_24h7d30d(collection):
     result = {"total_m_f_k_24h": result_last_24_hours[0] if len(result_last_24_hours) >0 else [], 
               "total_m_f_k_7d": result_last_7_days[0] if len(result_last_7_days) >0 else [], 
               "total_m_f_k_30d": result_last_30_days[0] if len(result_last_30_days) >0 else []}
-    # print(result)
+    print(result)
     return result
 
-def avg_hourly_visits(collection):
-    pipeline_avg_hourly_visitors = [
-        {
-            "$group": {
-                "_id": {"$hour": "$TimeStamp"},
-                "average_hourly_visitors": {"$avg": "$NoOfPeople"}
+
+
+
+
+
+
+
+
+
+
+
+# * _______________________ API 2 ___________________________
+
+
+def hourly_visits_last_24h(collection):
+    end_time = datetime.utcnow()
+    start_time = end_time - timedelta(hours=24)
+    pipeline_hourly_visits = [
+            {
+                "$match": {
+                    "TimeStamp": {"$gte": start_time, "$lt": end_time}
+                }
+            },
+            {
+                "$group": {
+                    "_id": {"hour": {"$hour": "$TimeStamp"}},
+                    "total_traffic": {"$sum": "$Totaltrafic"}
+                }
+            },
+            {
+                "$sort": {"_id.hour": 1}
             }
-        },
-        {
-            "$sort": {"_id": 1}
+        ]
+
+
+    # Execute the aggregation pipeline
+
+    # Format the result into JSON
+    result_hourly_visits = list(collection.aggregate(pipeline_hourly_visits))
+    # print(result_hourly_visits)
+    formatted_result = [{"hour": entry["_id"]["hour"], "total_traffic": entry["total_traffic"]} for entry in result_hourly_visits]
+
+    json_response = {"hourlyVisits": formatted_result}
+    # ic(json_response)
+    # result = {"hourlyVisits": []}
+    for visit in json_response["hourlyVisits"]:
+        visit['hour'] = (visit['hour'] + 3) % 24
+
+    ic(json_response)
+    # ic(result)
+    return json_response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def calculate_daily_visits_for_last_7d(collection):
+    current_utc_time = datetime.utcnow()
+
+    start_time_last_7_days = current_utc_time - timedelta(days=7)
+
+    pipeline_daily_visits_last_7_days = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_7_days}
         }
-    ]
-
-    # Execute the aggregation
-    result_avg_hourly_visitors = list(collection.aggregate(pipeline_avg_hourly_visitors))
-
-    # Extract the results
-    result  = []
-    for entry in result_avg_hourly_visitors:
-        id = entry["_id"] 
-        av = entry["average_hourly_visitors"]
-        {"hour": entry["_id"], "average_visitors": entry["average_hourly_visitors"]} 
-
-    average_hourly_visitors = [{"hour": entry["_id"], "average_visitors": int(entry["average_hourly_visitors"]) if entry["average_hourly_visitors"] != None else 0 } for entry in result_avg_hourly_visitors]
-
-    # Create a JSON response
-    json_response = {
-        "avgHourlyVisits": average_hourly_visitors
+    },
+    {
+        "$group": {
+            "_id": {
+                "$dateToString": {"format": "%Y-%m-%d", "date": "$TimeStamp"}
+            },
+            "total_visits": {"$sum": "$Totaltrafic"}
+        }
+    },
+    {
+        "$sort": {"_id": 1}
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "date": "$_id",
+            "total_visits": 1
+        }
     }
+    ]
+    
 
-    # print(json_response)
-    return json_response
+    json_result = list(collection.aggregate(pipeline_daily_visits_last_7_days))
+    json_result = {"daily_visits_7_days": json_result}
+    ic(json_result)
+    return json_result
 
 
 
-def busiest_hour_2h_interval(collection):
-    # Aggregation pipeline for average NoOfPeople for each 2-hour interval
-    result = avg_hourly_visits(collection)
-    result = result["avgHourlyVisits"]
-    # print(result)
-    hourly_sum = {i: 0 for i in range(1, 13)}
-    # ic(hourly_sum)
-    # Process the result and sum consecutive hours
-    for entry in result:
-        # The key represents the hour divided by 2 (e.g., 1, 2, ..., 12)
-        ic(entry["hour"])
-        if entry['hour'] != None:
-            key = (entry['hour'] - 1) // 2 + 1
-            # ic(key)
-            # ic(entry["average_visitors"])
-            hourly_sum[key] = entry['average_visitors']
 
-    # Generate the final result with 12 hours
-    final_result = [{'hour': i, 'total_average_visitors': hourly_sum[i]} for i in range(1, 13)]
-    json_response = {"busiestHours2hInterval":final_result}
-    print(json_response)
-    return json_response
-# busiest_hour_2h_interval(cd)
 
-def avg_daily_visit(collection):
-    pipeline_avg_daily_visitors = [
-        {
-            "$group": {
-                "_id": {"$dayOfWeek": "$TimeStamp"},
-                "average_daily_visitors": {"$avg": "$NoOfPeople"}
+
+
+
+
+
+
+def busiest_hour_7_days(collection):
+    start_time_last_7_days = datetime.utcnow() - timedelta(days=7)
+
+# Aggregation pipeline
+    pipeline = [
+    {
+        "$match": {
+            "TimeStamp": {"$gte": start_time_last_7_days}
+        }
+    },
+    {
+        "$addFields": {
+            "hour": {"$hour": {"date": "$TimeStamp", "timezone": "+00:00"}}
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$TimeStamp", "timezone": "+00:00"}},
+                "hour": "$hour"
+            },
+            "visits": {"$sum": "$Totaltrafic"}
+        }
+    },
+    {
+        "$group": {
+            "_id": "$_id.date",
+            "hourlyVisits": {
+                "$push": {
+                    "hour": "$_id.hour",
+                    "visits": "$visits"
+                }
             }
-        },
-        {
-            "$sort": {"_id": 1}
         }
-    ]
-
-    result_avg_daily_visitors = list(collection.aggregate(pipeline_avg_daily_visitors))
-    ic(result_avg_daily_visitors)
-    average_daily_visitors = [{"day_of_week": en["_id"], "average_visitors": en["average_daily_visitors"]} for en in result_avg_daily_visitors if en["_id"] != None ]
-
-    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    average_daily_visitors_mapped = [{day_names[en["day_of_week"] - 1]: en["average_visitors"]} for en in average_daily_visitors]
-
-    # Create a JSON response
-    json_response = {
-        "avgDailyVisits": average_daily_visitors_mapped
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "date": "$_id",
+            "hourlyVisits": 1
+        }
+    },
+    {
+        "$sort": {
+            "date": 1
+        }
+    },
+    {
+        "$group": {
+            "_id": None,
+            "result": {
+                "$push": {
+                    "k": "$date",
+                    "v": "$hourlyVisits"
+                }
+            }
+        }
+    },
+    {
+        "$replaceRoot": {
+            "newRoot": {
+                "$arrayToObject": "$result"
+            }
+        }
     }
+]
 
-    print(json_response)
-    return json_response
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+    # ic (result)
+    for date_visits in result:
+        for date, hourly_visits in date_visits.items():
+            sorted_hourly_visits = sorted(hourly_visits, key=lambda x: x['hour'])
+
+            date_visits[date] = sorted_hourly_visits
+    
+    sa_hour_convertion = {}
+    for key,value in result[0].items():
+        sa_hour_convertion.update({key:[]})
+        
+        for hour_visit_dict in value:
+            modified_hour = {}
+            modified_hour.update({"hour": (hour_visit_dict['hour'] + 3) % 24, "visits":hour_visit_dict["visits"]})
+            sa_hour_convertion[key].append(modified_hour)
+    result = {"busiestHour7Days": sa_hour_convertion}
+    ic(result)
+    return result
 
 
 
 
-#  ! ________________________________________________________________________-
 
 
 
+# * _________________________________ API 3 ________________________________
 
-#******** DAILY VISIT TREND BY GENDER ********************
-
-# DAILY GENDER TREND
 def gender_trend_30_days(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_30_days = current_utc_time - timedelta(days=30)
@@ -384,10 +471,7 @@ def gender_trend_30_days(collection):
 
 
 
-# *********** Weekly visiotrs trend for male and female  ************** 
 
-
-# GENDER TREND LAST 7 WEEKS
 def gender_trend_last_7_weeks(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
@@ -444,10 +528,14 @@ def gender_trend_last_7_weeks(collection):
 
 
 
-# ********* MONTHLY VISITORS TREND FOR MALE AND FEMALE FOR LAST 12 MONTHS **************
 
 
-# Aggregation pipeline for the last 12 months by TotalMale and TotalFemale
+
+
+
+
+
+
 def gender_trend_12_months(collection):
     current_utc_time = datetime.utcnow()
     # Calculate the start time for the last 12 months
@@ -481,7 +569,7 @@ def gender_trend_12_months(collection):
 
     # Execute the aggregation
     result_last_12_months_gender = list(collection.aggregate(pipeline_last_12_months_gender))
-    ic(result_last_12_months_gender)
+    # ic(result_last_12_months_gender)
     # Extract the results
     monthly_gender_visit_trend = [
         {
@@ -504,9 +592,17 @@ def gender_trend_12_months(collection):
 
 
 
-# ****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********
 
-def gender_trend_monthly_visits_for_last_12_months(collection):
+
+
+
+
+# * ______________________________ API 4 ___________________________________
+
+
+
+
+def monthly_visitors_count(collection):
     current_utc_time = datetime.utcnow()
     start_time_last_12_months = current_utc_time - timedelta(days=365)
     pipeline_last_12_months = [
@@ -521,7 +617,7 @@ def gender_trend_monthly_visits_for_last_12_months(collection):
                     "year": {"$year": "$TimeStamp"},
                     "month": {"$month": "$TimeStamp"}
                 },
-                "total_visitors": {"$sum": "$NoOfPeople"}
+                "total_visitors": {"$sum": "$Totaltrafic"}
             }
         },
         {
@@ -541,8 +637,8 @@ def gender_trend_monthly_visits_for_last_12_months(collection):
     }
 
     # Print the JSON response
-    ic("****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********")
-    print(json_response)
+    # ic("****** NUMBER OF VISITORS FOR LAST 12 MONTHS ********")
+    # print(json_response)
     return json_response
 
 
@@ -551,11 +647,6 @@ def gender_trend_monthly_visits_for_last_12_months(collection):
 
 
 
-
-
-
-
-# *********** Gender Distribution for last 7 hours *************** 
 
 def gender_trend_last_7_hours(collection):
     current_utc_time = datetime.utcnow()
@@ -605,10 +696,15 @@ def gender_trend_last_7_hours(collection):
         "genderTrendLast7Hours": gender_distribution_last_7_hours
     }
 
-    # Print the JSON response
-    ic("****************** TOTAL MALE AND FEMALE FOR LAST 7 HOURS ****************")
-    print(json_response)
-    return json_response
+    sa_hour_convertion = {"genderTrendLast7Hours": []}
+    # ic(json_response)
+    for i in json_response["genderTrendLast7Hours"]:
+        # ic(i)
+        temp = {}
+        temp.update({"hour": (i['hour'] + 3) % 24, "total_male":i["total_male"], 
+                     "total_female": i["total_female"], "total_kids": i["total_kids"]})
+        sa_hour_convertion["genderTrendLast7Hours"].append(temp)
 
 
-
+    ic(sa_hour_convertion)
+    return sa_hour_convertion

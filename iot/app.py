@@ -44,7 +44,6 @@ def avg_gender_trends():
 
     g_t_12m.update(g_7h)
 
-
     result = json.dumps(g_t_12m)
     return make_response(result,200)
 
@@ -72,6 +71,26 @@ def gender_trends():
 
 
 
+@app.route("/analytics/busiest_hour/", methods= ["GET"])
+def busiest_hour(): 
+    header = request.headers
+    token = header.get("Authorization")
+    if token != None: 
+        result = authentication.verify_token(token)
+        if result == False: 
+            return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    else:
+        return make_response(jsonify({"error": "Authentication Failed"}), 401)
+    
+    busiest_hour = agg_pipelines.busiest_hour_7_days(cd)
+    result = json.dumps(busiest_hour)
+    return make_response(result,200)
+
+
+
+
+
+
 @app.route("/analytics/average_visits/", methods= ["GET"])
 def average_visits(): 
     header = request.headers
@@ -82,19 +101,12 @@ def average_visits():
             return make_response(jsonify({"error": "Authentication Failed"}), 401)
     else:
         return make_response(jsonify({"error": "Authentication Failed"}), 401)
-    
-    # a_h = agg_pipelines.avg_hourly_visits(cd)
-    # a_d = agg_pipelines.avg_daily_visit(cd)
+
     t_24h = agg_pipelines.hourly_visits_last_24h(cd)
-    # ic(t_24h)
     t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(cd)
-    ic(t_7d)
-    # result= agg_pipelines.avg_hourly_visits(cd)
-    # print("********************")
-    # print(result)
-    busiest_hour = agg_pipelines.busiest_hour_7_days(cd)
+    # busiest_hour = agg_pipelines.busiest_hour_7_days(cd)
     t_24h.update(t_7d)
-    t_24h.update(busiest_hour)
+    # t_24h.update(busiest_hour)
 
     result = json.dumps(t_24h)
     return make_response(result,200)

@@ -407,15 +407,19 @@ def busiest_hour_7_days(collection):
             date_visits[date] = sorted_hourly_visits
     
     sa_hour_convertion = {}
-    for key,value in result[0].items(): 
-        sa_hour_convertion.update({key:[]})
-        
-        for hour_visit_dict in value:
-            modified_hour = {}
-            modified_hour.update({"hour": (hour_visit_dict['hour'] + 3) % 24, "visits":hour_visit_dict["visits"]})
-            sa_hour_convertion[key].append(modified_hour)
-    result = {"busiestHour7Days": sa_hour_convertion}
-    ic(result)
+    if len(result) > 0:
+        for key,value in result[0].items(): 
+            sa_hour_convertion.update({key:[]})
+            
+            for hour_visit_dict in value:
+                modified_hour = {}
+                modified_hour.update({"hour": (hour_visit_dict['hour'] + 3) % 24, "visits":hour_visit_dict["visits"]})
+                sa_hour_convertion[key].append(modified_hour)
+        result = {"busiestHour7Days": sa_hour_convertion}
+        ic(result)
+        return result
+    
+    result = {"busiestHour7Days": None}
     return result
 
 

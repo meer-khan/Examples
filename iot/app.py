@@ -238,9 +238,6 @@ def user():
             return make_response(jsonify({'error': error_message}), 500)
 
 
-
-
-
 if __name__ == "__main__":
     cu,cs,cd,cpd = db.main()
     if config("MODE") == 'DEV':

@@ -16,9 +16,11 @@ def create_db(client):
         collection_users = existing_db["Users"]
         collection_sites = existing_db["Sites"]
         collection_data = existing_db["Data"]
-        collection_processed_data = existing_db["ProcessedData"]
+        collection_queue_serving_time = existing_db["queueServingTime"]
+        collection_counter_idol_time = existing_db["counterIdolTime"]
+        collection_customer_order_time = existing_db["customerOrderTime"]
 
-        return collection_users,collection_sites,collection_data, collection_processed_data
+        return collection_users,collection_sites,collection_data, collection_queue_serving_time, collection_counter_idol_time, collection_customer_order_time
     except Exception as e:
         print(f"Error: {e}")
 

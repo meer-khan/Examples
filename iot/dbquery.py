@@ -46,10 +46,17 @@ def get_users(cu):
 
 
 def add_queue_serving_time(qst, site_id, queue_serving_time, total_individuals):
-    qst.insert_one({"SiteID": site_id, "queueServingTime": queue_serving_time , "totalIndividuals": total_individuals  })
+    qst.insert_one({"SiteID": site_id, 
+                    "queueServingTime": queue_serving_time , 
+                    "totalIndividuals": total_individuals, 
+                    "createdAt": datetime.utcnow()  })
 
 def add_counter_idol_time(cit, site_id, idol_time):
-    cit.insert_one({"SiteID": site_id, "idolTime": idol_time })
+    cit.insert_one({"SiteID": site_id, 
+                    "idolTime": idol_time,
+                    "createdAt": datetime.utcnow() })
 
 def add_customer_order_time(cot, site_id, customer_order_time):
-    cot.insert_one({"SiteID": site_id, "customerOrderTime": customer_order_time })
+    cot.insert_one({"SiteID": site_id, 
+                    "customerOrderTime": customer_order_time,
+                    "createdAt": datetime.utcnow() })

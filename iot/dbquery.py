@@ -22,10 +22,6 @@ def add_data(cd,site_id,user_id,no_of_people, total_traffic, total_male, total_f
     cd.insert_one({"DataID": 1, "SiteID": site_id, "UserID":user_id, "TimeStamp": datetime.utcnow() , "NoOfPeople": no_of_people, "Totaltrafic":total_traffic,
                     "TotalMale": total_male, "TotalFemale": total_female, "TotalKids": total_kids })
     
-def add_processed_data(cpd, total_traffic, total_male, total_female, total_kids, sa_time):
-    cpd.insert_one({"TimeStamp": datetime.utcnow() , "TotalTraffic":total_traffic,
-                    "TotalMale": total_male, "TotalFemale": total_female, "TotalKids": total_kids, "SaudiTime": sa_time })
-
 def get_one_user(cu, user_id):
     ic(user_id)
     found_user = cu.find_one({"_id": ObjectId(user_id)})
@@ -49,7 +45,11 @@ def get_users(cu):
     return users
 
 
-def get_total_visits():
-    pass
+def add_queue_serving_time(qst, site_id, queue_serving_time, total_individuals):
+    qst.insert_one({"SiteID": site_id, "queueServingTime": queue_serving_time , "totalIndividuals": total_individuals  })
 
-# def get_total_visits
+def add_counter_idol_time(cit, site_id, idol_time):
+    cit.insert_one({"SiteID": site_id, "idolTime": idol_time })
+
+def add_customer_order_time(cot, site_id, customer_order_time):
+    cot.insert_one({"SiteID": site_id, "customerOrderTime": customer_order_time })

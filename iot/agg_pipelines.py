@@ -323,13 +323,6 @@ def calculate_daily_visits_for_last_7d(collection):
 
 
 
-
-
-
-
-
-
-
 def busiest_hour_7_days(collection):
     start_time_last_7_days = datetime.utcnow() - timedelta(days=7)
 

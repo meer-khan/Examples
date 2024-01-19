@@ -25,7 +25,10 @@ cors = CORS(app, resources={r"/users/": {"origins": allowed_origins},
                                r"/analytics/average_visits/": {"origins": allowed_origins},
                                 r"/analytics/gender_trends/": {"origins": allowed_origins},
                                  r"/analytics/avg_gender_trends/": {"origins": allowed_origins},
-                                r"/analytics/busiest_hour/":{"origins": allowed_origins}
+                                r"/analytics/busiest_hour/":{"origins": allowed_origins}, 
+                                r"/queue_time/": {"origins": allowed_origins},
+                                r"/idol_time/": {"origins": allowed_origins},
+                                r"/order_time/": {"origins": allowed_origins},
                                  })
 
 

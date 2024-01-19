@@ -26,8 +26,8 @@ def create_db(client):
 
 def main():
     client = MongoClient(config("CONNMONGO"))
-    cu,cs,cd,cpd = create_db(client)
-    return cu,cs,cd, cpd
+    cu, cs, cd, cqst, ccit, ccot = create_db(client)
+    return cu, cs, cd, cqst, ccit, ccot
 
 
 

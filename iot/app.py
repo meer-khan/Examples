@@ -148,19 +148,38 @@ def total_visits():
 
 
 
-@app.route("/daily_data/", methods= ["POST"])
-def daily_data(): 
+
+
+
+
+@app.route("/idol_time/", methods= ["POST"])
+def queue_idol_time(): 
     try:
         data = request.json
-        total_traffic = data.get("totalTraffic")
-        total_male = data.get("totalMale")
-        total_female = data.get("totalFemale")
-        total_kids = data.get("totalKids")
-        time_stamp = data.get("timeStamp")
-        if total_traffic is None or total_male is None or total_female is None or total_kids is None: 
+        site_id = data.get("siteID")
+        idol_time = data.get("idolTIme")
+        if idol_time is None:
             result = {"error": "fields should not be none"}
             return make_response(jsonify(result), 400)
-        dbquery.add_processed_data(cpd,total_traffic,total_male,total_female, total_kids,time_stamp)
+        dbquery.add_counter_idol_time(cit = ccit, site_id=site_id, idol_time=idol_time)
+        result = {"msg":"data added successfully"}
+        return make_response(result,200)
+    except Exception as ex: 
+        return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
+
+
+
+@app.route("/queue_time/", methods= ["POST"])
+def queue_serving_time(): 
+    try:
+        data = request.json
+        site_id = data.get("siteID")
+        queue_time = data.get("queueTime")
+        total_individuals = data.get("totalIndividuals")
+        if queue_time is None or total_individuals is None:
+            result = {"error": "fields should not be none"}
+            return make_response(jsonify(result), 400)
+        dbquery.add_queue_serving_time(qst=cqst, site_id=site_id, queue_serving_time=queue_time, total_individuals=total_individuals )
         result = {"msg":"data added successfully"}
         return make_response(result,200)
     except Exception as ex: 
@@ -240,7 +259,7 @@ def user():
 
 
 if __name__ == "__main__":
-    cu,cs,cd,cpd = db.main()
+    cu,cs,cd,cqst, ccit, ccot = db.main()
     if config("MODE") == 'DEV':
         app.run(host='0.0.0.0', debug=True, port=5000)
     if config("MODE") == 'PROD':

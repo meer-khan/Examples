@@ -10,7 +10,7 @@ from waitress import serve
 from icecream import ic
 import db, dbquery
 from bson import json_util
-import agg_pipelines, agg_pipeline_add
+import agg_pipelines
 import authentication
 app = Flask(__name__)
 # app.config['UPLOAD_FOLDER'] = config("uploadFolder")
@@ -148,7 +148,20 @@ def total_visits():
 
 
 
-
+@app.route("/order_time/", methods= ["POST"])
+def customer_order_time(): 
+    try:
+        data = request.json
+        site_id = data.get("siteID")
+        order_time = data.get("orderTime")
+        if site_id is None or order_time is None:
+            result = {"error": "fields should not be none"}
+            return make_response(jsonify(result), 400)
+        dbquery.add_customer_order_time(cot = ccot, site_id=site_id, customer_order_time=order_time)
+        result = {"msg":"data added successfully"}
+        return make_response(result,201)
+    except Exception as ex: 
+        return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
 
 
 
@@ -158,12 +171,12 @@ def queue_idol_time():
         data = request.json
         site_id = data.get("siteID")
         idol_time = data.get("idolTIme")
-        if idol_time is None:
+        if site_id is None or idol_time is None:
             result = {"error": "fields should not be none"}
             return make_response(jsonify(result), 400)
         dbquery.add_counter_idol_time(cit = ccit, site_id=site_id, idol_time=idol_time)
         result = {"msg":"data added successfully"}
-        return make_response(result,200)
+        return make_response(result,201)
     except Exception as ex: 
         return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
 
@@ -176,12 +189,12 @@ def queue_serving_time():
         site_id = data.get("siteID")
         queue_time = data.get("queueTime")
         total_individuals = data.get("totalIndividuals")
-        if queue_time is None or total_individuals is None:
+        if site_id is None or queue_time is None or total_individuals is None:
             result = {"error": "fields should not be none"}
             return make_response(jsonify(result), 400)
         dbquery.add_queue_serving_time(qst=cqst, site_id=site_id, queue_serving_time=queue_time, total_individuals=total_individuals )
         result = {"msg":"data added successfully"}
-        return make_response(result,200)
+        return make_response(result,201)
     except Exception as ex: 
         return make_response(jsonify({"error":f"Exception: {ex}"}), 404)
 

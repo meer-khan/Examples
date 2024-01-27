@@ -51,10 +51,12 @@ def add_queue_serving_time(qst, site_id, queue_serving_time, total_individuals):
                     "totalIndividuals": total_individuals, 
                     "createdAt": datetime.utcnow()  })
 
-def add_counter_idol_time(cit, site_id, idol_time):
+def add_counter_idol_time(cit, site_id, idol_time, bson_binary, b64_image):
     cit.insert_one({"SiteID": site_id, 
                     "idolTime": idol_time,
-                    "createdAt": datetime.utcnow() })
+                    "createdAt": datetime.utcnow(),
+                     "imageData":  bson_binary, 
+                     "b64Image": b64_image})
 
 def add_customer_order_time(cot, site_id, customer_order_time):
     cot.insert_one({"SiteID": site_id, 

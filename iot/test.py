@@ -166,37 +166,55 @@ ic(utc)
 ct = datetime.now(timezone)
 ic(ct)
 
-pipeline_hourly_visits = [
-            {
-                "$match": {
-                    "TimeStamp": {"$gte": start_time, "$lt": end_time ,}
-                }
-            },
-                {"$project":{
-            "dateToParts":{"$dateToParts":{"date":'$TimeStamp',"timezone":'Asia/Riyadh'}}
-        }},
+# pipeline_hourly_visits = [
+    
+#             {
+#                 "$match": {
+#                     "TimeStamp": {"$gte": start_time, "$lt": end_time ,}
+#                 }
+#             },
+#                 {"$project":
+#                  {"dateToParts":
+#                   {"$dateToParts":
+#                    {"date":'$TimeStamp',"timezone":'Asia/Riyadh'}
+#                    }
+#                  },
+#                  "TimeStamp": 1
+#             },
                 
             
-            {"$limit":1}
-        ]
-result_hourly_visits = list(collection.aggregate(pipeline_hourly_visits))
-print(result_hourly_visits)
+#             {"$limit":1}
+#         ]
+# result_hourly_visits = list(collection.aggregate(pipeline_hourly_visits))
+# print(result_hourly_visits)
 
-ic("***************")
+# ic("***************")
 
-pipeline_hourly_visits = [
+# pipeline_hourly_visits = [
 
-            {
-                "$match": {
-                    "TimeStamp": {"$gte": start_time, "$lt": end_time}
-                }
-            },
+#             {
+#                 "$match": {
+#                     "TimeStamp": {"$gte": start_time, "$lt": end_time}
+#                 }
+#             },
                 
             
-            {"$limit":1}
-        ]
+#             {"$limit":1}
+#         ]
 
-result_hourly_visits = list(collection.aggregate(pipeline_hourly_visits))
-print(result_hourly_visits)
+# result_hourly_visits = list(collection.aggregate(pipeline_hourly_visits))
+# print(result_hourly_visits)
 # Close the connection
 client.close()
+
+
+
+
+# di = {"hour": 1, "hour2": 3}
+
+# di.update({"hour3": 7})
+# print(di)
+
+
+d = [1,2,None]
+print(all(d))

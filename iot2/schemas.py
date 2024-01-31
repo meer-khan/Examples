@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 class TrafficInfo(BaseModel):
     siteID: str
@@ -23,13 +23,22 @@ class QueueTime(BaseModel):
     queueTime: int
     totalIndividuals: int
 
-class Login(BaseModel):
+class AdminLogin(BaseModel):
     username: str
     password: str
 
-class Site(BaseModel):
-    user_id: str
+class SiteRegistration(BaseModel):
+    adminId: str
+    email: EmailStr
     location: str
+    totalCapacity:int
+    longitude: float
+    latitude: float
+
+class SiteLogin(BaseModel):
+    email: str
+    password: str
+
 
 class Admin(BaseModel):
     pass 

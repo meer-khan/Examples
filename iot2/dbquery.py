@@ -24,6 +24,25 @@ def add_site(cs, user_id, location, total_capacity):
     )
     return str(inserted_record.inserted_id)
 
+
+def register_site(collection_site, admin_id, email, password, location, total_capacity, longitude, latitude):
+    record = {
+        "adminId": admin_id,
+        "email": email,
+        "password": password,
+        "location": location,
+        "totalCapacity": total_capacity,
+        "cordinates": {"type": "Point", "cordinates": [longitude, latitude]},
+    }
+
+    inserted_record = collection_site.insert_one(record)
+
+    return str(inserted_record.inserted_id)
+
+def site_login(collection_site, email): 
+    site = collection_site.find_one({"email": email}, projection= {"email": 1, "password": 1})
+    return site
+
 def get_site(cs, site_id):
     print("im in get")
     print(site_id)
@@ -58,9 +77,8 @@ def add_data(
     )
 
 
-def get_one_user(cu, user_id):
-    ic(user_id)
-    found_user = cu.find_one({"_id": ObjectId(user_id)})
+def get_one_user(collection_user, user_id):
+    found_user = collection_user.find_one({"_id": ObjectId(user_id)})
 
     if found_user:
         return found_user

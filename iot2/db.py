@@ -14,11 +14,15 @@ def create_db(client):
 
         # Insert a document into a collection (this will create the database if it doesn't exist)
         collection_users = existing_db["Users"]
-        collection_sites = existing_db["Sites"]
+        collection_sites = existing_db["sites"]
         collection_data = existing_db["Data"]
         collection_queue_serving_time = existing_db["queueServingTime"]
         collection_counter_idol_time = existing_db["counterIdolTime"]
         collection_customer_order_time = existing_db["customerOrderTime"]
+
+
+        # Create indexes
+        # collection_sites.create_index("email", unique=True)
         # test = existing_db['test']
 
         return (
@@ -37,6 +41,7 @@ def create_db(client):
 def main():
     client = MongoClient(config("CONNMONGO"))
     cu, cs, cd, cqst, ccit, ccot = create_db(client)
+    cs.create_index("email", unique= True)
     return cu, cs, cd, cqst, ccit, ccot
 
 

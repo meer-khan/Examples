@@ -4,6 +4,7 @@ import schemas
 from fastapi.security.oauth2 import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from icecream import ic
+from decouple import config
 
 oauth_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -17,7 +18,7 @@ def create_access_token(data:dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-
+    ic(to_encode)
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -25,15 +26,17 @@ def verify_token(token:str, credentials_exception):
 
     try:
         payload = jwt.decode(token,SECRET_KEY, algorithms=ALGORITHM)
-        id: str = payload.get("user_id")
+        ic(payload)
+        email: str = payload.get("email")
+        id :str = payload.get("id")
 
-        if id is None: 
-            raise credentials_exception
-        ic(id)
-        token_data = schemas.TokenData(id=id)
+        if email is None or id is None: 
+            return credentials_exception
+        # ic(id)
+        token_data = schemas.TokenData(email=email, id= id)
 
     except JWTError: 
-        raise credentials_exception
+        return credentials_exception
     
     return token_data
     

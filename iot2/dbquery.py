@@ -25,14 +25,17 @@ def add_site(cs, user_id, location, total_capacity):
     return str(inserted_record.inserted_id)
 
 
-def register_site(collection_site, admin_id, email, password, location, total_capacity, longitude, latitude):
+def register_site(collection_site, admin_id, email, name, password, location, total_capacity, longitude, latitude):
     record = {
         "adminId": admin_id,
         "email": email,
         "password": password,
+        "name": name,
         "location": location,
         "totalCapacity": total_capacity,
         "cordinates": {"type": "Point", "cordinates": [longitude, latitude]},
+        "active_status": True,
+        "show_data": True
     }
 
     inserted_record = collection_site.insert_one(record)
@@ -43,12 +46,27 @@ def site_login(collection_site, email):
     site = collection_site.find_one({"email": email}, projection= {"email": 1, "password": 1})
     return site
 
+def admin_login(collection_admin, email): 
+    admin = collection_admin.find_one({"email": email}, projection= {"email": 1, "password": 1})
+    return admin
+
 def get_site(cs, site_id):
-    print("im in get")
-    print(site_id)
-    site = cs.find_one({"SiteID": site_id})
+
+    site = cs.find_one({"_id": ObjectId(site_id)})
     return site
 
+def get_admin(ca, email:str, id:str):
+
+    admin = ca.find_one({"_id": ObjectId(id), "email": email})
+    return admin
+
+def add_admin(ca, email, password):
+    data = ca.insert_one({"email": email, "password": password})
+    return data
+
+def get_admin_data(cs): 
+    data = cs.find({}, projection = {"location": 1, "name": 1})
+    return data
 
 def add_data(
     cd,

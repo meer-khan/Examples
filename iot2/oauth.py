@@ -32,7 +32,6 @@ def verify_token(token:str, credentials_exception):
 
         if email is None or id is None: 
             return credentials_exception
-        # ic(id)
         token_data = schemas.TokenData(email=email, id= id)
 
     except JWTError: 

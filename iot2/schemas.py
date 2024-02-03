@@ -1,14 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator, PydanticUserError, ConfigDict
+from pydantic import BaseModel, EmailStr
+from fastapi import UploadFile
 from bson import ObjectId
 
-class TrafficInfo(BaseModel):
-    siteID: str
-    # totalCapacity: int
-    noOfPeople: int
-    totalTraffic: int
-    totalMale: int
-    totalFemale: int
-    totalKids: int 
+
 
 class OrderTime(BaseModel):
     siteID: str
@@ -74,15 +68,37 @@ class AdminProfile(BaseModel):
     name:str
     location:str
 
-# except PydanticUserError as exc_info:
-#     print("*****************")
-#     print(exc_info)
-#     print("**********************")
-#     assert exc_info.code == 'decorator-missing-field'
-
 class TokenData(BaseModel):
     email: EmailStr
     id: str
 
-class Admin(BaseModel):
-    pass 
+
+
+class QueueTime(BaseModel):
+    siteId:str 
+    queueTime: int
+    totalIndividuals: int
+
+
+class IdolTime(BaseModel):
+    siteId:str 
+    image: bytes
+    idolTime: int
+
+class IdolTime(BaseModel):
+    siteId:str 
+    image: bytes
+    idolTime: int
+
+class OrderTime(BaseModel): 
+    siteId: str
+    orderTime: int
+
+
+class TrafficInfo(BaseModel):
+    siteId: str
+    noOfPeople: int
+    totalTraffic: int
+    totalMale: int
+    totalFemale: int
+    totalKids: int 

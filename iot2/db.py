@@ -13,20 +13,15 @@ def create_db(client):
         existing_db = client[database_name]
 
         # Insert a document into a collection (this will create the database if it doesn't exist)
-        collection_users = existing_db["Users"]
+        collection_admin = existing_db["admin"]
         collection_sites = existing_db["sites"]
-        collection_data = existing_db["Data"]
+        collection_data = existing_db["data"]
         collection_queue_serving_time = existing_db["queueServingTime"]
         collection_counter_idol_time = existing_db["counterIdolTime"]
         collection_customer_order_time = existing_db["customerOrderTime"]
 
-
-        # Create indexes
-        # collection_sites.create_index("email", unique=True)
-        # test = existing_db['test']
-
         return (
-            collection_users,
+            collection_admin,
             collection_sites,
             collection_data,
             collection_queue_serving_time,
@@ -40,25 +35,25 @@ def create_db(client):
 
 def main():
     client = MongoClient(config("CONNMONGO"))
-    cu, cs, cd, cqst, ccit, ccot = create_db(client)
+    ca, cs, cd, cqst, ccit, ccot = create_db(client)
     cs.create_index("email", unique= True)
-    return cu, cs, cd, cqst, ccit, ccot
+    return ca, cs, cd, cqst, ccit, ccot
 
 
-def add_site(cs, user_id, location):
-    inserted_record = cs.insert_one({"UserID": user_id, "Location": location})
-    return str(inserted_record.inserted_id)
+# def add_site(cs, user_id, location):
+#     inserted_record = cs.insert_one({"UserID": user_id, "Location": location})
+#     return str(inserted_record.inserted_id)
 
 
-def get_one_user(cu, user_id):
-    ic(user_id)
-    found_user = cu.find_one({"_id": user_id})
-    if found_user:
-        print(found_user)
-        return found_user
-    else:
-        print(found_user)
-        return None
+# def get_one_user(cu, user_id):
+#     ic(user_id)
+#     found_user = cu.find_one({"_id": user_id})
+#     if found_user:
+#         print(found_user)
+#         return found_user
+#     else:
+#         print(found_user)
+#         return None
 
 
 # def db_connnection():

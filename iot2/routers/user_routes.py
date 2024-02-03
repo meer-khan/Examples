@@ -110,13 +110,10 @@ async def site_login(data: schemas.Login, response: Response):
     }
     
 
-
-
-
 @router.get(
     "/site/profile", status_code=status.HTTP_200_OK, response_model=schemas.SiteProfile
 )
-async def get_profile(response: Response, token:str =  Depends(oauth2_scheme)):
+async def site_profile(response: Response, token:str =  Depends(oauth2_scheme)):
     print(token)
     result = oauth.get_current_user(token=token)
 
@@ -212,3 +209,7 @@ async def admin_profile(response: Response, token:str = Depends(oauth2_scheme)):
     return  HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Data not Found"
         )
+
+
+
+# TODO: add _id in site profile as well

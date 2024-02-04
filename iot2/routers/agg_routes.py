@@ -1,19 +1,20 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from icecream import ic
 import agg_pipelines
-import db
+# import db
+import main
 
 # import utils
 # import oauth
 
 router = APIRouter(tags=["AGG_ROUTES"], prefix="/analytics")
-cu, cs, cd, cqst, ccit, ccot = db.main()
+# cu, cs, cd, cqst, ccit, ccot = db.main()
 
 
 @router.get("/avg_gender_trends/", status_code=status.HTTP_200_OK)
 def avg_gender_trends():
-    g_t_12m = agg_pipelines.monthly_visitors_count(cd)
-    g_7h = agg_pipelines.gender_trend_last_7_hours(cd)
+    g_t_12m = agg_pipelines.monthly_visitors_count(main.cd)
+    g_7h = agg_pipelines.gender_trend_last_7_hours(main.cd)
     g_t_12m.update(g_7h)
 
     result = g_t_12m
@@ -23,9 +24,9 @@ def avg_gender_trends():
 
 @router.get("/gender_trends/", status_code=status.HTTP_200_OK)
 def gender_trends():
-    g_30d = agg_pipelines.gender_trend_30_days(cd)
-    g_7w = agg_pipelines.gender_trend_last_7_weeks(cd)
-    g_12m = agg_pipelines.gender_trend_12_months(cd)
+    g_30d = agg_pipelines.gender_trend_30_days(main.cd)
+    g_7w = agg_pipelines.gender_trend_last_7_weeks(main.cd)
+    g_12m = agg_pipelines.gender_trend_12_months(main.cd)
 
     g_30d.update(g_7w)
     g_30d.update(g_12m)
@@ -37,7 +38,7 @@ def gender_trends():
 
 @router.get("/busiest_hour/", status_code=status.HTTP_200_OK)
 def busiest_hour():
-    busiest_hour = agg_pipelines.busiest_hour_7_days(cd)
+    busiest_hour = agg_pipelines.busiest_hour_7_days(main.cd)
     result = busiest_hour
 
     return result
@@ -45,8 +46,8 @@ def busiest_hour():
 
 @router.get("/average_visits/", status_code=status.HTTP_200_OK)
 def average_visits():
-    t_24h = agg_pipelines.hourly_visits_last_24h(cd)
-    t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(cd)
+    t_24h = agg_pipelines.hourly_visits_last_24h(main.cd)
+    t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(main.cd)
     t_24h.update(t_7d)
     result = t_24h
 

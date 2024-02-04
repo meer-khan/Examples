@@ -3,7 +3,7 @@ from icecream import ic
 from datetime import datetime
 from bson import ObjectId
 import hashlib
-
+import pytz
 
 def add_user(cu, brand_name, customer_email, password, location):
     inserted_record = cu.insert_one(
@@ -120,7 +120,7 @@ def get_users(cu):
 def add_queue_serving_time(qst, site_id, queue_serving_time, total_individuals):
     qst.insert_one(
         {
-            "SiteID": site_id,
+            "siteId": site_id,
             "queueServingTime": queue_serving_time,
             "totalIndividuals": total_individuals,
             "createdAt": datetime.utcnow(),
@@ -131,7 +131,7 @@ def add_queue_serving_time(qst, site_id, queue_serving_time, total_individuals):
 def add_counter_idol_time(cit, site_id, idol_time, bson_binary, b64_image):
     cit.insert_one(
         {
-            "SiteID": site_id,
+            "siteId": site_id,
             "idolTime": idol_time,
             "createdAt": datetime.utcnow(),
             "bsonBinImage": bson_binary,
@@ -141,9 +141,20 @@ def add_counter_idol_time(cit, site_id, idol_time, bson_binary, b64_image):
 
 
 def add_customer_order_time(cot, site_id, customer_order_time):
+    
+    # # Get the current UTC time
+    # utc_now = datetime.utcnow()
+
+    # # Specify the Saudi time zone
+    # saudi_timezone = pytz.timezone("Asia/Riyadh")
+
+    # # Localize the UTC time to the Saudi time zone
+    # saudi_time = utc_now.replace(tzinfo=pytz.utc).astimezone(saudi_timezone)
+
+    # print(saudi_time)
     cot.insert_one(
         {
-            "SiteID": site_id,
+            "siteId": site_id,
             "customerOrderTime": customer_order_time,
             "createdAt": datetime.utcnow(),
         }

@@ -13,6 +13,7 @@ def create_db(client):
         existing_db = client[database_name]
 
         # Insert a document into a collection (this will create the database if it doesn't exist)
+        collection_super_admin = existing_db["superAdmin"]
         collection_admin = existing_db["admin"]
         collection_sites = existing_db["sites"]
         collection_data = existing_db["data"]
@@ -21,6 +22,7 @@ def create_db(client):
         collection_customer_order_time = existing_db["customerOrderTime"]
 
         return (
+            collection_super_admin,
             collection_admin,
             collection_sites,
             collection_data,
@@ -35,9 +37,9 @@ def create_db(client):
 
 def main():
     client = MongoClient(config("CONNMONGO"))
-    ca, cs, cd, cqst, ccit, ccot = create_db(client)
+    csa, ca, cs, cd, cqst, ccit, ccot = create_db(client)
     cs.create_index("email", unique= True)
-    return ca, cs, cd, cqst, ccit, ccot
+    return csa, ca, cs, cd, cqst, ccit, ccot
 
 
 # def add_site(cs, user_id, location):

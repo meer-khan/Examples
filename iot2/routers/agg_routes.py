@@ -3,16 +3,16 @@ from icecream import ic
 import agg_pipelines
 import oauth
 import main
-from routers.user_routes import oauth2_scheme
+# from iot2.routers.site_routes import oauth2_scheme
 # import utils
 # import oauth
 
-router = APIRouter(tags=["AGG_ROUTES"], prefix="/analytics")
+router = APIRouter(tags=["AGG ROUTES"], prefix="/analytics")
 # cu, cs, cd, cqst, ccit, ccot = db.main()
 
 
 @router.get("/avg_gender_trends/", status_code=status.HTTP_200_OK)
-def avg_gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
+def avg_gender_trends(response:Response , token:str = Depends(main.oauth2_scheme)):
 
     result = oauth.get_current_user(token=token)
 
@@ -32,7 +32,7 @@ def avg_gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
 
 
 @router.get("/gender_trends/", status_code=status.HTTP_200_OK)
-def gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
+def gender_trends(response:Response , token:str = Depends(main.oauth2_scheme)):
 
     result = oauth.get_current_user(token=token)
 
@@ -55,7 +55,7 @@ def gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
 
 
 @router.get("/busiest_hour/", status_code=status.HTTP_200_OK)
-def busiest_hour(response:Response , token:str = Depends(oauth2_scheme)):
+def busiest_hour(response:Response , token:str = Depends(main.oauth2_scheme)):
     
     result = oauth.get_current_user(token=token)
 
@@ -81,7 +81,7 @@ def average_visits():
 
 
 @router.get("/total_visits/", status_code=status.HTTP_200_OK)
-def total_visits(response:Response , token:str = Depends(oauth2_scheme)):
+def total_visits(response:Response , token:str = Depends(main.oauth2_scheme)):
     
     result = oauth.get_current_user(token=token)
 

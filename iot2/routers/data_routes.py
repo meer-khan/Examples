@@ -13,7 +13,7 @@ import dbquery
 import schemas
 import main
 import oauth
-from routers.user_routes import oauth2_scheme
+# from iot2.routers.site_routes import oauth2_scheme
 import base64
 import bson.binary
 from bson import Binary

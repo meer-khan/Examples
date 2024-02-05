@@ -135,7 +135,7 @@ def queue_serving_time(
         )
 
 
-@router.post("/traffic-info/", status_code=status.HTTP_201_CREATED)
+@router.post("/traffic_info/", status_code=status.HTTP_201_CREATED)
 def add_traffic_info(data: schemas.TrafficInfo, response: Response):
     site_id = data.siteId
     no_of_people = data.noOfPeople
@@ -147,7 +147,6 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
     try:
         site_data = dbquery.get_site(main.cs, site_id)
         if site_data:
-            ic(site_id)
             dbquery.add_data(
                 main.cd,
                 site_id,
@@ -167,7 +166,8 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
             )
 
     except Exception as ex:
+        print(ex)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=ex
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Exception: {ex}"
         )

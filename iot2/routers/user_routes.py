@@ -189,7 +189,7 @@ async def admin_profile(response: Response, token:str = Depends(oauth2_scheme)):
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
         )
     
     admin = dbquery.get_admin(main.ca, result.email, result.id)

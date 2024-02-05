@@ -1,9 +1,9 @@
-from fastapi import status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter, Response
 from icecream import ic
 import agg_pipelines
-# import db
+import oauth
 import main
-
+from routers.user_routes import oauth2_scheme
 # import utils
 # import oauth
 
@@ -12,7 +12,16 @@ router = APIRouter(tags=["AGG_ROUTES"], prefix="/analytics")
 
 
 @router.get("/avg_gender_trends/", status_code=status.HTTP_200_OK)
-def avg_gender_trends():
+def avg_gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
+
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
+
     g_t_12m = agg_pipelines.monthly_visitors_count(main.cd)
     g_7h = agg_pipelines.gender_trend_last_7_hours(main.cd)
     g_t_12m.update(g_7h)
@@ -23,7 +32,16 @@ def avg_gender_trends():
 
 
 @router.get("/gender_trends/", status_code=status.HTTP_200_OK)
-def gender_trends():
+def gender_trends(response:Response , token:str = Depends(oauth2_scheme)):
+
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
+    
     g_30d = agg_pipelines.gender_trend_30_days(main.cd)
     g_7w = agg_pipelines.gender_trend_last_7_weeks(main.cd)
     g_12m = agg_pipelines.gender_trend_12_months(main.cd)
@@ -37,7 +55,15 @@ def gender_trends():
 
 
 @router.get("/busiest_hour/", status_code=status.HTTP_200_OK)
-def busiest_hour():
+def busiest_hour(response:Response , token:str = Depends(oauth2_scheme)):
+    
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
     busiest_hour = agg_pipelines.busiest_hour_7_days(main.cd)
     result = busiest_hour
 
@@ -55,7 +81,15 @@ def average_visits():
 
 
 @router.get("/total_visits/", status_code=status.HTTP_200_OK)
-def total_visits():
+def total_visits(response:Response , token:str = Depends(oauth2_scheme)):
+    
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
     try:
         t_24h = agg_pipelines.total_visit_last_24_hours(cd)
         t_7d = agg_pipelines.total_visit_last_7_days(cd)

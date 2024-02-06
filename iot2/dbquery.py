@@ -62,11 +62,15 @@ def get_admin(ca, email:str, id:str):
 
 def add_admin(ca, email, password):
     data = ca.insert_one({"email": email, "password": password})
-    return data
+    return str(data.inserted_id)
 
 def get_admin_data(cs): 
     data = cs.find({}, projection = {"location": 1, "name": 1})
     return data
+
+def add_super_admin(csa, email, password): 
+    data = csa.insert_one({"email": email, "password": password})
+    return str(data.inserted_id)
 
 def add_data(
     cd,

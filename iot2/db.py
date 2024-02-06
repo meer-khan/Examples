@@ -39,6 +39,8 @@ def main():
     client = MongoClient(config("CONNMONGO"))
     csa, ca, cs, cd, cqst, ccit, ccot = create_db(client)
     cs.create_index("email", unique= True)
+    ca.create_index("email", unique= True)
+
     return csa, ca, cs, cd, cqst, ccit, ccot
 
 

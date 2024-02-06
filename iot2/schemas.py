@@ -38,16 +38,16 @@ class Login(BaseModel):
 class GetProfile(BaseModel):
     token:str
 
-class ObjectIdStr(str):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+# class ObjectIdStr(str):
+#     @classmethod
+#     def __get_validators__(cls):
+#         yield cls.validate
 
-    @classmethod
-    def validate(cls, v) -> str:
-        if not isinstance(v, ObjectId):
-            raise ValueError('Not a valid ObjectId')
-        return str(v)
+#     @classmethod
+#     def validate(cls, v) -> str:
+#         if not isinstance(v, ObjectId):
+#             raise ValueError('Not a valid ObjectId')
+#         return str(v)
 
 class SiteProfile(BaseModel): 
     def __init__(self, **data):
@@ -61,6 +61,17 @@ class SiteProfile(BaseModel):
     name:str
     totalCapacity:int
     cordinates: dict
+
+class AdminRegistration(BaseModel): 
+    email: EmailStr
+
+
+
+class AdminRegistrationReturn(BaseModel): 
+    id: str
+    email: EmailStr
+    password: str
+
 
 # try:
 class AdminProfile(BaseModel): 

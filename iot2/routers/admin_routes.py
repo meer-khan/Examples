@@ -15,13 +15,51 @@ router = APIRouter(tags=["Admin Routes"], prefix="/admin")
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@router.get("/admin/registraion", )
-def admin_registration():
-    email = "shahmirkhan519@gmail.com"
-    hashed_password = utils.hash("Pakistan2212")
-    data = dbquery.add_admin(main.ca, email=email, password=hashed_password)
-    ic(data)
-    return "OK"
+@router.post("/registration", )
+def admin_registration(data: schemas.AdminRegistration, response: Response, token:str =  Depends(main.oauth2_scheme)):
+    
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result , HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Admin not found: Token Expired: Try Login again",
+        )
+    try:
+        user = dbquery.get_one_user(collection_user=main.csa, user_id=result.id)
+        if not user:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Admin with id {result.id} does not exists",
+            )
+
+        # generate random password 5 
+        # lUX3*T8!
+        random_password = utils.generate_random_password(8)
+        hashed_password = utils.hash(random_password)
+        try:
+            admin_id = dbquery.add_admin(main.ca, email=data.email, password=hashed_password)
+            return {
+            "msg": "site registraion successful",
+            "adminId": admin_id,
+            "email": data.email,
+            "password": random_password,
+        }
+        
+
+        except errors.DuplicateKeyError as ex:
+            response.status_code = status.HTTP_409_CONFLICT
+            return HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"email '{data.email}'already exists",
+            )
+    except Exception as ex:
+        response.status_code = status.HTTP_409_CONFLICT
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
+        )
 
 
 
@@ -30,7 +68,7 @@ def admin_registration():
 async def admin_login(data: schemas.Login, response: Response):
 
     admin = dbquery.admin_login(main.ca, email=data.email)
-
+    
     if not admin:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
@@ -65,7 +103,7 @@ async def admin_profile(response: Response, token:str = Depends(main.oauth2_sche
 
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
         )
     

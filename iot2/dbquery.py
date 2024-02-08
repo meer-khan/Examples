@@ -64,8 +64,8 @@ def add_admin(ca, email, password):
     data = ca.insert_one({"email": email, "password": password})
     return str(data.inserted_id)
 
-def get_admin_data(cs): 
-    data = cs.find({}, projection = {"location": 1, "name": 1})
+def get_admin_data(cs, admin_id): 
+    data = cs.find({"adminId": admin_id}, projection = {"location": 1, "name": 1})
     return data
 
 def add_super_admin(csa, email, password): 

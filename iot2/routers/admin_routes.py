@@ -36,7 +36,7 @@ def admin_registration(data: schemas.AdminRegistration, response: Response, toke
             )
 
         # generate random password 5 
-        # lUX3*T8!
+        # EcT/5~F\" 520@gmail
         random_password = utils.generate_random_password(8)
         hashed_password = utils.hash(random_password)
         try:
@@ -110,7 +110,7 @@ async def admin_profile(response: Response, token:str = Depends(main.oauth2_sche
     admin = dbquery.get_admin(main.ca, result.email, result.id)
 
     if admin: 
-        results = dbquery.get_admin_data(main.cs)
+        results = dbquery.get_admin_data(main.cs, result.id)
         data = []
         for document in results: 
             _id = document.pop("_id")

@@ -59,3 +59,36 @@ async def admin_login(data: schemas.Login, response: Response):
         "token_type": "bearer",
     }
 
+
+
+
+@router.get(
+    "/profile", status_code=status.HTTP_200_OK, response_model= List[schemas.AdminProfile]
+)
+async def admin_profile(response: Response, token:str = Depends(main.oauth2_scheme)):
+
+    result = oauth.get_current_user(token=token)
+
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
+    
+    admin = dbquery.get_admin(main.ca, result.email, result.id)
+
+    if admin: 
+        results = dbquery.get_admin_data(main.cs)
+        data = []
+        for document in results: 
+            _id = document.pop("_id")
+            document.update({"id": str(_id)})
+
+            data.append(document)
+
+        ic(data)
+        return data
+    
+    return  HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Data not Found"
+        )

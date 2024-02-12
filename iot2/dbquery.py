@@ -5,6 +5,7 @@ from bson import ObjectId
 import hashlib
 import pytz
 
+
 def add_user(cu, brand_name, customer_email, password, location):
     inserted_record = cu.insert_one(
         {
@@ -25,7 +26,17 @@ def add_site(cs, user_id, location, total_capacity):
     return str(inserted_record.inserted_id)
 
 
-def register_site(collection_site, admin_id, email, name, password, location, total_capacity, longitude, latitude):
+def register_site(
+    collection_site,
+    admin_id,
+    email,
+    name,
+    password,
+    location,
+    total_capacity,
+    longitude,
+    latitude,
+):
     record = {
         "adminId": admin_id,
         "email": email,
@@ -35,42 +46,60 @@ def register_site(collection_site, admin_id, email, name, password, location, to
         "totalCapacity": total_capacity,
         "cordinates": {"type": "Point", "cordinates": [longitude, latitude]},
         "active_status": True,
-        "show_data": True
+        "show_data": True,
     }
 
     inserted_record = collection_site.insert_one(record)
 
     return str(inserted_record.inserted_id)
 
-def site_login(collection_site, email): 
-    site = collection_site.find_one({"email": email}, projection= {"email": 1, "password": 1})
+
+def site_login(collection_site, email):
+    site = collection_site.find_one(
+        {"email": email}, projection={"email": 1, "password": 1}
+    )
     return site
 
-def admin_login(collection_admin, email): 
-    admin = collection_admin.find_one({"email": email}, projection= {"email": 1, "password": 1})
+
+def admin_login(collection_admin, email):
+    admin = collection_admin.find_one(
+        {"email": email}, projection={"email": 1, "password": 1}
+    )
     return admin
+
 
 def get_site(cs, site_id):
 
     site = cs.find_one({"_id": ObjectId(site_id)})
     return site
 
-def get_admin(ca, email:str, id:str):
+
+def get_admin(ca, email: str, id: str):
 
     admin = ca.find_one({"_id": ObjectId(id), "email": email})
     return admin
+
 
 def add_admin(ca, email, password):
     data = ca.insert_one({"email": email, "password": password})
     return str(data.inserted_id)
 
-def get_admin_data(cs, admin_id): 
-    data = cs.find({"adminId": admin_id}, projection = {"location": 1, "name": 1})
+
+def get_admin_data(cs, admin_id):
+    data = cs.find({"adminId": admin_id}, projection={"location": 1, "name": 1})
     return data
 
-def add_super_admin(csa, email, password): 
+
+def add_super_admin(csa, email, password):
     data = csa.insert_one({"email": email, "password": password})
     return str(data.inserted_id)
+
+
+def update_site(cs, field_name, site_id):
+    cs.update_one(
+        {"_id": ObjectId(site_id)}, {"$set": {field_name: {"$ne": True}}}
+    )
+
 
 def add_data(
     cd,
@@ -145,7 +174,7 @@ def add_counter_idol_time(cit, site_id, idol_time, bson_binary, b64_image):
 
 
 def add_customer_order_time(cot, site_id, customer_order_time):
-    
+
     # # Get the current UTC time
     # utc_now = datetime.utcnow()
 

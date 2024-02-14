@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_serializer
 from fastapi import UploadFile
 from bson import ObjectId
 
@@ -75,8 +75,13 @@ class AdminRegistrationReturn(BaseModel):
 
 # try:
 class AdminProfile(BaseModel): 
-    id : str = Field(alias="_id")
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    id : str = Field(alias="_id", strict=False)
     email:str
+
+    # @field_serializer('_id', when_used='always', check_fields=False)
+    # def serialize_id_to_str(_id: str):
+    #     return _id
 
 class TokenData(BaseModel):
     email: EmailStr

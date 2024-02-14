@@ -89,33 +89,34 @@ async def super_admin_profile(response: Response, token:str = Depends(main.oauth
             status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
         )
 
+@router.get(
+    "/profile/{admin_id}", status_code=status.HTTP_200_OK,  response_model=List[schemas.SAAdminSitesRet]
+)
+async def super_admin_profile(admin_id, response: Response, token:str = Depends(main.oauth2_scheme)):
 
-# @router.get(
-#     "/profile/{admin_id}", status_code=status.HTTP_200_OK, response_model= List[schemas.AdminProfile]
-# )
-# async def super_admin_profile(admin_id, response: Response, token:str = Depends(main.oauth2_scheme)):
+    result = oauth.get_current_user(token=token)
 
-#     result = oauth.get_current_user(token=token)
-
-#     if isinstance(result, HTTPException):
-#         response.status_code = status.HTTP_401_UNAUTHORIZED
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
-#         )
+    if isinstance(result, HTTPException):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+        )
     
-#     admin = dbquery.get_admin(main.csa, result.email, result.id)
+    sites = dbquery.super_admin_get_sites_of_admin(main.cs, admin_id)
 
-#     if admin: 
-#         results = dbquery.get_admin_data(main.cs)
-#         data = []
-#         for document in results: 
-#             document["_id"] = str(document.get("_id"))
-#             data.append(document)
-#         return data
-#     response.status_code = status.HTTP_404_NOT_FOUND
-#     return  HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
-#         )
+    if sites: 
+        data = []
+        for document in sites: 
+            document["_id"] = str(document.get("_id"))
+            data.append(document)
+            ic(type(document["cordinates"]))
+            ic(document["cordinates"])
+            # schemas.SAAdminSitesRet(si)
+        return data
+    response.status_code = status.HTTP_404_NOT_FOUND
+    return  HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
+        )
 
 
 @router.put("/profile/{site_id}/{field_name}")
@@ -133,7 +134,7 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
             )
-        # ic(result)
+
         super_admin = dbquery.get_admin(main.csa, result.email, result.id)
         # ic(super_admin)
         if super_admin: 

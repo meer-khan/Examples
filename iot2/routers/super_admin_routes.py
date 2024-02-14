@@ -65,7 +65,7 @@ async def admin_login(data: schemas.Login, response: Response):
 @router.get(
     "/profile", status_code=status.HTTP_200_OK, response_model= List[schemas.AdminProfile]
 )
-async def admin_profile(response: Response, token:str = Depends(main.oauth2_scheme)):
+async def super_admin_profile(response: Response, token:str = Depends(main.oauth2_scheme)):
 
     result = oauth.get_current_user(token=token)
 
@@ -75,18 +75,14 @@ async def admin_profile(response: Response, token:str = Depends(main.oauth2_sche
             status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
         )
     
-    admin = dbquery.get_admin(main.ca, result.email, result.id)
+    admin = dbquery.get_admin(main.csa, result.email, result.id)
 
     if admin: 
-        results = dbquery.get_admin_data(main.cs)
+        results = dbquery.get_all_admins(main.ca)
         data = []
         for document in results: 
-            _id = document.pop("_id")
-            document.update({"id": str(_id)})
-
+            document["_id"] = str(document.get("_id"))
             data.append(document)
-
-        # ic(data)
         return data
     response.status_code = status.HTTP_404_NOT_FOUND
     return  HTTPException(
@@ -94,9 +90,32 @@ async def admin_profile(response: Response, token:str = Depends(main.oauth2_sche
         )
 
 
-@router.patch("/profile", status_code= status.HTTP_204_NO_CONTENT)
-async def super_admin_profile_update(response: Response):
-    ...
+# @router.get(
+#     "/profile/{admin_id}", status_code=status.HTTP_200_OK, response_model= List[schemas.AdminProfile]
+# )
+# async def super_admin_profile(admin_id, response: Response, token:str = Depends(main.oauth2_scheme)):
+
+#     result = oauth.get_current_user(token=token)
+
+#     if isinstance(result, HTTPException):
+#         response.status_code = status.HTTP_401_UNAUTHORIZED
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+#         )
+    
+#     admin = dbquery.get_admin(main.csa, result.email, result.id)
+
+#     if admin: 
+#         results = dbquery.get_admin_data(main.cs)
+#         data = []
+#         for document in results: 
+#             document["_id"] = str(document.get("_id"))
+#             data.append(document)
+#         return data
+#     response.status_code = status.HTTP_404_NOT_FOUND
+#     return  HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
+#         )
 
 
 @router.put("/profile/{site_id}/{field_name}")
@@ -118,11 +137,11 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
         super_admin = dbquery.get_admin(main.csa, result.email, result.id)
         # ic(super_admin)
         if super_admin: 
-            updated_site = dbquery.update_site(main.cs, field_name=field_name, site_id=site_id)
+            updated_site, toggled_value = dbquery.update_site(main.cs, field_name=field_name, site_id=site_id)
             # print(updated_site)
             # ic(updated_site)
             if updated_site.modified_count:
-                return {"message": f"{field_name} toggled for item {site_id}"}
+                return {"message": f"{field_name} toggled for item {site_id}", "value": toggled_value}
             
             # ic(updated_site.modified_count)
         

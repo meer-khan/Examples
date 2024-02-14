@@ -86,11 +86,11 @@ async def admin_profile(response: Response, token:str = Depends(main.oauth2_sche
 
             data.append(document)
 
-        ic(data)
+        # ic(data)
         return data
-    
+    response.status_code = status.HTTP_404_NOT_FOUND
     return  HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Data not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
         )
 
 
@@ -114,13 +114,22 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
             )
-        
-        super_admin = dbquery.get_admin(main.ca, result.email, result.id)
-        
+        # ic(result)
+        super_admin = dbquery.get_admin(main.csa, result.email, result.id)
+        # ic(super_admin)
         if super_admin: 
-            dbquery.update_site(main.cs, field_name=field_name, site_id=site_id)
-
-        return {"message": f"{field_name} toggled for item {site_id}"}
+            updated_site = dbquery.update_site(main.cs, field_name=field_name, site_id=site_id)
+            # print(updated_site)
+            # ic(updated_site)
+            if updated_site.modified_count:
+                return {"message": f"{field_name} toggled for item {site_id}"}
+            
+            # ic(updated_site.modified_count)
+        
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return  HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

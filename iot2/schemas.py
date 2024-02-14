@@ -80,13 +80,8 @@ class AdminProfile(BaseModel):
     id : str = Field(alias="_id", strict=False)
     email:str
 
-    # @field_serializer('_id', when_used='always', check_fields=False)
-    # def serialize_id_to_str(_id: str):
-    #     return _id
-
 class SAAdminSitesRet(BaseModel): 
 
-    # model_config = ConfigDict(arbitrary_types_allowed=True)
     id : str = Field(alias="_id", title="Document Id")
     email: EmailStr
     name: str
@@ -95,17 +90,6 @@ class SAAdminSitesRet(BaseModel):
     cordinates: dict
     active_status: bool
     show_data: bool
-    # @field_serializer("_id", return_type=str , check_fields=False)
-    # def type_converter(_id: ObjectId ): 
-    #     return str(_id)
-    # @field_validator('_id', mode="before",  check_fields=False)
-    # @classmethod
-    # def change_type(cls, v: ObjectId):
-    #     ic(v)
-    #     print("HELLO MY FIREND")
-    #     return str(v)
-
-
 
 
 class TokenData(BaseModel):

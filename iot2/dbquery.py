@@ -115,6 +115,9 @@ def update_site(cs, site_id, field_name):
         )
     return updated_site, new_value
 
+def super_admin_get_sites_of_admin(cs, admin_id):
+    sites = cs.find({"adminId": admin_id}, projection= {"password": 0})
+    return sites
 
 def add_data(
     cd,

@@ -95,10 +95,22 @@ def add_super_admin(csa, email, password):
     return str(data.inserted_id)
 
 
-def update_site(cs, field_name, site_id):
-    cs.update_one(
-        {"_id": ObjectId(site_id)}, {"$set": {field_name: {"$ne": True}}}
-    )
+def update_site(cs, site_id, field_name):
+    # cs.find({"adminId": site_id}, projection={"location": 1, "name": 1})
+    # updated_site = cs.update_one(
+    #     {"_id": ObjectId(site_id)}, {"$bit": {field_name: {"$or": 1}}}
+    # )
+    item = cs.find_one({"_id": ObjectId(site_id)})
+
+    # Toggle the specified boolean field
+    new_value = not item[field_name]
+
+    # Update the item in MongoDB
+    updated_site = cs.update_one(
+            {"_id": ObjectId(site_id)},
+            {"$set": {field_name: new_value}}
+        )
+    return updated_site
 
 
 def add_data(

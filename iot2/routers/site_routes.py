@@ -117,7 +117,7 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
     result = oauth.get_current_user(token=token)
 
     if isinstance(result , HTTPException):
-        # ic("YESS")
+        
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -125,12 +125,20 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
         )
 
     site_data: dict = dbquery.get_site(main.cs, site_id=result.id)
+    profile_show_check = site_data.get("show_data")
 
     if not site_data:
         response.status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Site not found: Token Expired- Try Login again",
+        )
+    
+    if not profile_show_check:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Site not found: Payment needs to be done before accessing your dashboard",
         )
     
     return site_data

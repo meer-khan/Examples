@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_serializer
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_serializer, field_validator, PlainSerializer
 from fastapi import UploadFile
 from bson import ObjectId
-
+from icecream import ic
+from typing_extensions import Annotated, Dict, Any
 
 
 class OrderTime(BaseModel):
@@ -82,6 +83,30 @@ class AdminProfile(BaseModel):
     # @field_serializer('_id', when_used='always', check_fields=False)
     # def serialize_id_to_str(_id: str):
     #     return _id
+
+class SAAdminSitesRet(BaseModel): 
+
+    # model_config = ConfigDict(arbitrary_types_allowed=True)
+    id : str = Field(alias="_id", title="Document Id")
+    email: EmailStr
+    name: str
+    location: str
+    totalCapacity: int 
+    cordinates: dict
+    active_status: bool
+    show_data: bool
+    # @field_serializer("_id", return_type=str , check_fields=False)
+    # def type_converter(_id: ObjectId ): 
+    #     return str(_id)
+    # @field_validator('_id', mode="before",  check_fields=False)
+    # @classmethod
+    # def change_type(cls, v: ObjectId):
+    #     ic(v)
+    #     print("HELLO MY FIREND")
+    #     return str(v)
+
+
+
 
 class TokenData(BaseModel):
     email: EmailStr

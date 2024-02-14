@@ -13,9 +13,7 @@ import dbquery
 import schemas
 import main
 import oauth
-# from iot2.routers.site_routes import oauth2_scheme
 import base64
-import bson.binary
 from bson import Binary
 
 router = APIRouter(tags=["DATA ROUTES"])
@@ -26,15 +24,23 @@ def customer_order_time(data: schemas.OrderTime, response: Response):
     try:
         site_id = data.siteId
         order_time = data.orderTime
-        site_data = dbquery.get_site(main.cs, site_id = site_id)
+        site_data = dbquery.get_site(main.cs, site_id=site_id)
+
+        if not site_data.get("active_status"):
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Node access is revoked due to pending payment",
+            )
+
         if site_data:
             dbquery.add_customer_order_time(
-                cot=main.ccot, site_id= site_id, customer_order_time=order_time
+                cot=main.ccot, site_id=site_id, customer_order_time=order_time
             )
             result = {"msg": "data added successfully"}
 
             return result
-        
+
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
@@ -45,12 +51,9 @@ def customer_order_time(data: schemas.OrderTime, response: Response):
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Exception: {ex}",
-            )
-
-
-
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Exception: {ex}",
+        )
 
 
 @router.post("/idol_time/", status_code=status.HTTP_201_CREATED)
@@ -62,8 +65,16 @@ def queue_idol_time(
 ):
     try:
         image_bytes = image.file.read()
-        site_id = dbquery.get_site(main.cs, site_id = siteId)
-        if site_id:
+        site_data = dbquery.get_site(main.cs, site_id=siteId)
+
+        if not site_data.get("active_status"):
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Node access is revoked due to pending payment",
+            )
+
+        if site_data:
             schemas.IdolTime(siteId=siteId, image=image_bytes, idolTime=idolTime)
 
             image_base64 = base64.b64encode(image_bytes).decode("utf-8")
@@ -84,7 +95,7 @@ def queue_idol_time(
             }
 
             return result
-        
+
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
@@ -108,6 +119,14 @@ def queue_serving_time(
     try:
         site_id = data.siteId
         site_data = dbquery.get_site(main.cs, site_id=site_id)
+
+        if not site_data.get("active_status"):
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Node access is revoked due to pending payment",
+            )
+
         if site_data:
             queue_time = data.queueTime
             total_individuals = data.totalIndividuals
@@ -146,6 +165,14 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
     ic(data.model_dump())
     try:
         site_data = dbquery.get_site(main.cs, site_id)
+
+        if not site_data.get("active_status"):
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Node access is revoked due to pending payment",
+            )
+
         if site_data:
             dbquery.add_data(
                 main.cd,

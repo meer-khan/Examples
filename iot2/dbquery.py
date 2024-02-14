@@ -89,6 +89,9 @@ def get_admin_data(cs, admin_id):
     data = cs.find({"adminId": admin_id}, projection={"location": 1, "name": 1})
     return data
 
+def get_all_admins(ca): 
+    data = ca.find()
+    return data
 
 def add_super_admin(csa, email, password):
     data = csa.insert_one({"email": email, "password": password})
@@ -110,7 +113,7 @@ def update_site(cs, site_id, field_name):
             {"_id": ObjectId(site_id)},
             {"$set": {field_name: new_value}}
         )
-    return updated_site
+    return updated_site, new_value
 
 
 def add_data(

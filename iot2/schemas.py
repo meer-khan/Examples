@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from fastapi import UploadFile
 from bson import ObjectId
 
@@ -75,9 +75,8 @@ class AdminRegistrationReturn(BaseModel):
 
 # try:
 class AdminProfile(BaseModel): 
-    id : str
-    name:str
-    location:str
+    id : str = Field(alias="_id")
+    email:str
 
 class TokenData(BaseModel):
     email: EmailStr

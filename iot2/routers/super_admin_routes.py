@@ -26,10 +26,6 @@ router = APIRouter(tags=["Admin Routes"], prefix="/super-admin")
 
 
 
-
-
-
-
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def admin_login(data: schemas.Login, response: Response):
 
@@ -109,13 +105,10 @@ async def super_admin_profile(admin_id, response: Response, token:str = Depends(
         for document in sites: 
             document["_id"] = str(document.get("_id"))
             data.append(document)
-            ic(type(document["cordinates"]))
-            ic(document["cordinates"])
-            # schemas.SAAdminSitesRet(si)
         return data
     response.status_code = status.HTTP_404_NOT_FOUND
     return  HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Sites not Found"
         )
 
 
@@ -136,15 +129,10 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
             )
 
         super_admin = dbquery.get_admin(main.csa, result.email, result.id)
-        # ic(super_admin)
         if super_admin: 
             updated_site, toggled_value = dbquery.update_site(main.cs, field_name=field_name, site_id=site_id)
-            # print(updated_site)
-            # ic(updated_site)
             if updated_site.modified_count:
                 return {"message": f"{field_name} toggled for item {site_id}", "value": toggled_value}
-            
-            # ic(updated_site.modified_count)
         
         response.status_code = status.HTTP_404_NOT_FOUND
         return  HTTPException(

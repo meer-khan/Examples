@@ -24,14 +24,13 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
     result = oauth.get_current_user(token=token)
 
     if isinstance(result , HTTPException):
-        # ic("YESS")
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Admin not found: Token Expired: Try Login again",
         )
     try:
-        admin_id = data.adminId
+        admin_id = result.id
         user = dbquery.get_one_user(collection_user=main.ca, user_id=admin_id)
         if not user:
             response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -98,7 +97,7 @@ async def site_login(data: schemas.Login, response: Response):
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
         )
-    # ic(type(site.get("_id")))
+
     access_token = oauth.create_access_token(
         {"email": site.get("email"), "id": str(site.get("_id"))}
     )
@@ -113,11 +112,11 @@ async def site_login(data: schemas.Login, response: Response):
     "/site/profile", status_code=status.HTTP_200_OK, response_model=schemas.SiteProfile
 )
 async def site_profile(response: Response, token:str =  Depends(main.oauth2_scheme)):
-    print(token)
+
     result = oauth.get_current_user(token=token)
 
     if isinstance(result , HTTPException):
-        
+
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

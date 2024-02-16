@@ -76,7 +76,7 @@ async def admin_login(data: schemas.Login, response: Response):
         if not admin:
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
             )
 
         hashed_password = admin.get("password")
@@ -85,7 +85,7 @@ async def admin_login(data: schemas.Login, response: Response):
         if not pass_verify:
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
             )
 
         access_token = oauth.create_access_token(
@@ -109,32 +109,37 @@ async def admin_login(data: schemas.Login, response: Response):
     response_model=List[schemas.AdminProfileSites],
 )
 async def admin_profile(response: Response, token: str = Depends(main.oauth2_scheme)):
+    try: 
+        result = oauth.get_current_user(token=token)
 
-    result = oauth.get_current_user(token=token)
+        if isinstance(result, HTTPException):
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail= ExceptionLiterals.INVALID_TOKEN,
+            )
 
-    if isinstance(result, HTTPException):
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Token - Try Login again",
-        )
+        admin = dbquery.get_admin(main.ca, result.email, result.id)
 
-    admin = dbquery.get_admin(main.ca, result.email, result.id)
+        if admin:
+            results = dbquery.get_admin_data(main.cs, result.id)
+            data = []
+            for document in results:
+                _id = document.pop("_id")
+                document.update({"_id": str(_id)})
 
-    if admin:
-        results = dbquery.get_admin_data(main.cs, result.id)
-        data = []
-        for document in results:
-            _id = document.pop("_id")
-            document.update({"_id": str(_id)})
+                data.append(document)
+            return data
 
-            data.append(document)
-        return data
-
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Data not Found"
+        else:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail= ExceptionLiterals.ID_NOT_FOUND
+            )
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
         )
 
 
@@ -148,22 +153,29 @@ async def admin_profile_site_by_id(
     id: str, response: Response, token: str = Depends(main.oauth2_scheme)
 ):
     
-    result = oauth.get_current_user(token=token)
-    if isinstance(result, HTTPException):
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Token - Try Login again",
-        )
+    try:
+        result = oauth.get_current_user(token=token)
+        if isinstance(result, HTTPException):
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail= ExceptionLiterals.INVALID_TOKEN,
+            )
 
-    admin = dbquery.get_admin(main.ca, result.email, result.id)
+        admin = dbquery.get_admin(main.ca, result.email, result.id)
 
-    if admin:
-        results = dbquery.get_site(main.cs, site_id=id, admin_id=result.id)
-        return results
+        if admin:
+            results = dbquery.get_site(main.cs, site_id=id, admin_id=result.id)
+            return results
 
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Data not Found"
+        else:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail= ExceptionLiterals.ID_NOT_FOUND
+            )
+    
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
         )

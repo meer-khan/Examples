@@ -25,8 +25,8 @@ def avg_gender_trends(response:Response , token:str = Depends(main.oauth2_scheme
                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
 
-        g_t_12m = agg_pipelines.monthly_visitors_count(main.cd)
-        g_7h = agg_pipelines.gender_trend_last_7_hours(main.cd)
+        g_t_12m = agg_pipelines.monthly_visitors_count(main.cd, site_id=result.id)
+        g_7h = agg_pipelines.gender_trend_last_7_hours(main.cd, site_id=result.id)
         g_t_12m.update(g_7h)
 
         result = g_t_12m
@@ -51,9 +51,9 @@ def gender_trends(response:Response , token:str = Depends(main.oauth2_scheme)):
                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
         
-        g_30d = agg_pipelines.gender_trend_30_days(main.cd)
-        g_7w = agg_pipelines.gender_trend_last_7_weeks(main.cd)
-        g_12m = agg_pipelines.gender_trend_12_months(main.cd)
+        g_30d = agg_pipelines.gender_trend_30_days(main.cd, site_id=result.id)
+        g_7w = agg_pipelines.gender_trend_last_7_weeks(main.cd, site_id=result.id)
+        g_12m = agg_pipelines.gender_trend_12_months(main.cd, site_id=result.id)
 
         g_30d.update(g_7w)
         g_30d.update(g_12m)
@@ -80,7 +80,7 @@ def busiest_hour(response:Response , token:str = Depends(main.oauth2_scheme)):
             return HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
-        busiest_hour = agg_pipelines.busiest_hour_7_days(main.cd)
+        busiest_hour = agg_pipelines.busiest_hour_7_days(main.cd, site_id=result.id)
         result = busiest_hour
 
         return result
@@ -104,8 +104,8 @@ def average_visits(response:Response , token:str = Depends(main.oauth2_scheme)):
                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
         
-        t_24h = agg_pipelines.hourly_visits_last_24h(main.cd)
-        t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(main.cd)
+        t_24h = agg_pipelines.hourly_visits_last_24h(main.cd, site_id=result.id)
+        t_7d = agg_pipelines.calculate_daily_visits_for_last_7d(main.cd, site_id=result.id)
         t_24h.update(t_7d)
         result = t_24h
 
@@ -125,14 +125,14 @@ def total_visits(response:Response , token:str = Depends(main.oauth2_scheme)):
 
         if isinstance(result, HTTPException):
             response.status_code = status.HTTP_401_UNAUTHORIZED
-            
+
             return HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
         
-        t_24h = agg_pipelines.total_visit_last_24_hours(main.cd)
-        t_7d = agg_pipelines.total_visit_last_7_days(main.cd)
-        c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(main.cd)
+        t_24h = agg_pipelines.total_visit_last_24_hours(main.cd, site_id=result.id)
+        t_7d = agg_pipelines.total_visit_last_7_days(main.cd, site_id=result.id)
+        c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(main.cd, site_id=result.id)
 
         t_24h.update(t_7d)
         t_24h.update(c_t)

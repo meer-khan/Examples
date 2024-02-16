@@ -68,8 +68,10 @@ def admin_login(collection_admin, email):
     return admin
 
 
-def get_site(cs, site_id):
-
+def get_site(cs, site_id, admin_id=None):
+    if admin_id:
+        site = cs.find_one({"_id": ObjectId(site_id), "adminId": admin_id})
+        return site
     site = cs.find_one({"_id": ObjectId(site_id)})
     return site
 
@@ -89,9 +91,11 @@ def get_admin_data(cs, admin_id):
     data = cs.find({"adminId": admin_id}, projection={"location": 1, "name": 1})
     return data
 
-def get_all_admins(ca): 
+
+def get_all_admins(ca):
     data = ca.find()
     return data
+
 
 def add_super_admin(csa, email, password):
     data = csa.insert_one({"email": email, "password": password})
@@ -110,14 +114,15 @@ def update_site(cs, site_id, field_name):
 
     # Update the item in MongoDB
     updated_site = cs.update_one(
-            {"_id": ObjectId(site_id)},
-            {"$set": {field_name: new_value}}
-        )
+        {"_id": ObjectId(site_id)}, {"$set": {field_name: new_value}}
+    )
     return updated_site, new_value
 
+
 def super_admin_get_sites_of_admin(cs, admin_id):
-    sites = cs.find({"adminId": admin_id}, projection= {"password": 0})
+    sites = cs.find({"adminId": admin_id}, projection={"password": 0})
     return sites
+
 
 def add_data(
     cd,
@@ -128,11 +133,6 @@ def add_data(
     total_female,
     total_kids,
 ):
-    # sa_tz = pytz.timezone('Asia/Riyadh')
-    # local_time = datetime.now(sa_tz)
-    # ic(local_time)
-    # Convert local time to UTC
-    # utc_time = local_time.astimezone(pytz.utc)
     cd.insert_one(
         {
             "SiteID": site_id,
@@ -158,9 +158,8 @@ def get_one_user(collection_user, user_id):
 def get_users(cu):
     users = []
     all_users = cu.find({}, {"Password": 0, "UserID": 0})
+    
     for user in all_users:
-        # ic(type(user))
-        # ic(str(user.get("_id")))
         user["_id"] = str(user.get("_id"))
         users.append(user)
 

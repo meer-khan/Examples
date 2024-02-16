@@ -24,7 +24,7 @@ class AdminLogin(BaseModel):
     password: str
 
 class SiteRegistration(BaseModel):
-    adminId: str
+    # adminId: str
     email: EmailStr
     name: str
     location: str
@@ -39,16 +39,6 @@ class Login(BaseModel):
 class GetProfile(BaseModel):
     token:str
 
-# class ObjectIdStr(str):
-#     @classmethod
-#     def __get_validators__(cls):
-#         yield cls.validate
-
-#     @classmethod
-#     def validate(cls, v) -> str:
-#         if not isinstance(v, ObjectId):
-#             raise ValueError('Not a valid ObjectId')
-#         return str(v)
 
 class SiteProfile(BaseModel): 
     def __init__(self, **data):
@@ -73,8 +63,13 @@ class AdminRegistrationReturn(BaseModel):
     email: EmailStr
     password: str
 
+class AdminProfileSites(BaseModel): 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    id : str = Field(alias="_id", strict=False)
+    location:str
+    name:str
 
-# try:
+
 class AdminProfile(BaseModel): 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     id : str = Field(alias="_id", strict=False)

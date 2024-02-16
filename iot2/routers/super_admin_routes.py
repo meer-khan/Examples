@@ -2,6 +2,7 @@ from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from typing import List
 from icecream import ic
+from message_literals.messages import ExceptionLiterals, SuccessLiterals
 import dbquery
 import oauth
 import schemas
@@ -26,32 +27,36 @@ router = APIRouter(tags=["Admin Routes"], prefix="/super-admin")
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def admin_login(data: schemas.Login, response: Response):
+    try:
+        admin = dbquery.admin_login(main.csa, email=data.email)
+        
+        if not admin:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+            )
 
-    admin = dbquery.admin_login(main.csa, email=data.email)
+        hashed_password = admin.get("password")
+        pass_verify = utils.verify(data.password, hashed_password)
+
+        if not pass_verify:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+            )
+
+        access_token = oauth.create_access_token(
+            {"email": admin.get("email"), "id": str(admin.get("_id"))}
+        )
+
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+        }
     
-    if not admin:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
-        )
-
-    hashed_password = admin.get("password")
-    pass_verify = utils.verify(data.password, hashed_password)
-
-    if not pass_verify:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
-        )
-
-    access_token = oauth.create_access_token(
-        {"email": admin.get("email"), "id": str(admin.get("_id"))}
-    )
-
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-    }
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise HTTPException(status_code=500, detail=str(ex))
 
 
 
@@ -61,54 +66,64 @@ async def admin_login(data: schemas.Login, response: Response):
 )
 async def super_admin_profile(response: Response, token:str = Depends(main.oauth2_scheme)):
 
-    result = oauth.get_current_user(token=token)
+    try:
 
-    if isinstance(result, HTTPException):
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
-        )
-    
-    admin = dbquery.get_admin(main.csa, result.email, result.id)
+        result = oauth.get_current_user(token=token)
 
-    if admin: 
-        results = dbquery.get_all_admins(main.ca)
-        data = []
-        for document in results: 
-            document["_id"] = str(document.get("_id"))
-            data.append(document)
-        return data
-    response.status_code = status.HTTP_404_NOT_FOUND
-    return  HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
-        )
+        if isinstance(result, HTTPException):
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
+            )
+        
+        admin = dbquery.get_admin(main.csa, result.email, result.id)
+
+        if admin: 
+            results = dbquery.get_all_admins(main.ca)
+            data = []
+            for document in results: 
+                document["_id"] = str(document.get("_id"))
+                data.append(document)
+            return data
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return  HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail= ExceptionLiterals.ID_NOT_FOUND
+            )
+
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise HTTPException(status_code=500, detail=str(ex))
 
 @router.get(
     "/profile/{admin_id}", status_code=status.HTTP_200_OK,  response_model=List[schemas.SAAdminSitesRet]
 )
 async def super_admin_profile(admin_id, response: Response, token:str = Depends(main.oauth2_scheme)):
 
-    result = oauth.get_current_user(token=token)
+    try:
 
-    if isinstance(result, HTTPException):
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
-        )
-    
-    sites = dbquery.super_admin_get_sites_of_admin(main.cs, admin_id)
+        result = oauth.get_current_user(token=token)
 
-    if sites: 
-        data = []
-        for document in sites: 
-            document["_id"] = str(document.get("_id"))
-            data.append(document)
-        return data
-    response.status_code = status.HTTP_404_NOT_FOUND
-    return  HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Sites not Found"
-        )
+        if isinstance(result, HTTPException):
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
+            )
+        
+        sites = dbquery.super_admin_get_sites_of_admin(main.cs, admin_id)
 
+        if sites: 
+            data = []
+            for document in sites: 
+                document["_id"] = str(document.get("_id"))
+                data.append(document)
+            return data
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return  HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail= ExceptionLiterals.ID_NOT_FOUND
+            )
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise HTTPException(status_code=500, detail=str(ex))
 
 @router.put("/profile/{site_id}/{field_name}")
 async def admin_profile_update(site_id: str, field_name: str, response: Response, token:str = Depends(main.oauth2_scheme)):
@@ -123,7 +138,7 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
         if isinstance(result, HTTPException):
             response.status_code = status.HTTP_401_UNAUTHORIZED
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_TOKEN
             )
 
         super_admin = dbquery.get_admin(main.csa, result.email, result.id)
@@ -134,8 +149,9 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
         
         response.status_code = status.HTTP_404_NOT_FOUND
         return  HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Admin/Data not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail= ExceptionLiterals.ID_NOT_FOUND
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as ex:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise HTTPException(status_code=500, detail=str(ex))

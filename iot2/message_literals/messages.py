@@ -9,3 +9,4 @@ class ExceptionLiterals:
 class SuccessLiterals:
     REGISTRATION_SUCCESSFUL = "registration successful "
     LOGIN_SUCCESSFUL = "login successful "
+    INSERT_SUCCESSFUL = "data added successfully"

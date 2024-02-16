@@ -3,11 +3,10 @@ THis router is for all users, site_owner or admin
 """
 
 from fastapi import status, HTTPException, Depends, APIRouter, Response
-# from fastapi.security.oauth2 import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pymongo import errors
 from typing import List
 from icecream import ic
-from bson import ObjectId
+from message_literals.messages import ExceptionLiterals, SuccessLiterals
 import dbquery
 import oauth
 import schemas
@@ -27,7 +26,7 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Admin not found: Token Expired: Try Login again",
+            detail= ExceptionLiterals.INVALID_TOKEN,
         )
     try:
         admin_id = result.id
@@ -36,7 +35,7 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Admin with id {admin_id} does not exists",
+                detail= ExceptionLiterals.ID_NOT_FOUND,
             )
 
         # generate random password 5 
@@ -60,11 +59,11 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
             response.status_code = status.HTTP_409_CONFLICT
             return HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"email '{data.email}'already exists",
+                detail= ExceptionLiterals.EMAIL_ALREADY_EXISTS + data.email,
             )
 
         return {
-            "msg": "site registraion successful",
+            "detail": SuccessLiterals.REGISTRATION_SUCCESSFUL,
             "siteId": site_id,
             "email": data.email,
             "password": random_password,
@@ -79,15 +78,13 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
 
 @router.post("/site/login", status_code=status.HTTP_200_OK)
 async def site_login(data: schemas.Login, response: Response):
-    print(data.email)
-    print(data.password)
 
     site = dbquery.site_login(main.cs, email=data.email)
 
     if not site:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
         )
 
     hashed_password = site.get("password")
@@ -95,7 +92,7 @@ async def site_login(data: schemas.Login, response: Response):
     if not result:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
         )
 
     access_token = oauth.create_access_token(
@@ -120,7 +117,7 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Site not found: Token Expired- Try Login again",
+            detail= ExceptionLiterals.INVALID_TOKEN,
         )
 
     site_data: dict = dbquery.get_site(main.cs, site_id=result.id)
@@ -130,14 +127,14 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
         response.status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Site not found: Token Expired- Try Login again",
+            detail= ExceptionLiterals.INVALID_TOKEN,
         )
     
     if not profile_show_check:
         response.status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Site not found: Payment needs to be done before accessing your dashboard",
+            detail= ExceptionLiterals.ACCESS_REVOKED,
         )
     
     return site_data

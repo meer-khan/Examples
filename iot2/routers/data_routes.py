@@ -162,7 +162,7 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
     total_male = data.totalMale
     total_female = data.totalFemale
     total_kids = data.totalKids
-    ic(data.model_dump())
+    
     try:
         site_data = dbquery.get_site(main.cs, site_id)
 

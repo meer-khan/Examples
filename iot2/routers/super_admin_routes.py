@@ -1,9 +1,7 @@
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from pymongo import errors
 from typing import List
 from icecream import ic
-from bson import ObjectId
 import dbquery
 import oauth
 import schemas
@@ -68,7 +66,7 @@ async def super_admin_profile(response: Response, token:str = Depends(main.oauth
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
     
     admin = dbquery.get_admin(main.csa, result.email, result.id)
@@ -95,7 +93,7 @@ async def super_admin_profile(admin_id, response: Response, token:str = Depends(
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
     
     sites = dbquery.super_admin_get_sites_of_admin(main.cs, admin_id)
@@ -125,7 +123,7 @@ async def admin_profile_update(site_id: str, field_name: str, response: Response
         if isinstance(result, HTTPException):
             response.status_code = status.HTTP_401_UNAUTHORIZED
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
             )
 
         super_admin = dbquery.get_admin(main.csa, result.email, result.id)

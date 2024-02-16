@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 from icecream import ic
+from bson import ObjectId
 
 
 # Connect to MongoDB
 # client = MongoClient("mongodb://localhost:27017/")
 # db = client["CoffeeShop"]
 # cd = db["Data"]
-def total_visit_last_24_hours(collection):
+def total_visit_last_24_hours(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_24_hours = current_utc_time - timedelta(hours=24)
     start_time_previous_24_hours = start_time_last_24_hours - timedelta(hours=24)
@@ -15,7 +16,11 @@ def total_visit_last_24_hours(collection):
     pipeline_last_24_hours = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_24_hours, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {
+                    "$gte": start_time_last_24_hours,
+                    "$lt": current_utc_time,
+                },
             }
         },
         {"$group": {"_id": None, "user_count_last_24_hours": {"$sum": "$Totaltrafic"}}},
@@ -24,10 +29,11 @@ def total_visit_last_24_hours(collection):
     pipeline_previous_24_hours = [
         {
             "$match": {
+                "SiteID": site_id,
                 "TimeStamp": {
                     "$gte": start_time_previous_24_hours,
                     "$lt": start_time_last_24_hours,
-                }
+                },
             }
         },
         {
@@ -52,8 +58,8 @@ def total_visit_last_24_hours(collection):
         else 0
     )
     user_count_difference = user_count_last_24_hours - user_count_previous_24_hours
-    print("Visitor Count Last 24 Hours:", user_count_last_24_hours)
-    print("Visitor Count Difference 24 Hours:", user_count_previous_24_hours)
+    # print("Visitor Count Last 24 Hours:", user_count_last_24_hours)
+    # print("Visitor Count Difference 24 Hours:", user_count_previous_24_hours)
     json_response = {
         "visitorLast24Hour": user_count_last_24_hours,
         "visitorPrevious24Hour": user_count_previous_24_hours,
@@ -61,14 +67,15 @@ def total_visit_last_24_hours(collection):
     return json_response
 
 
-def total_visit_last_7_days(collection):
+def total_visit_last_7_days(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_7_days = current_utc_time - timedelta(days=7)
     start_time_previous_7_days = start_time_last_7_days - timedelta(days=7)
     pipeline_last_7_days = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_days, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_7_days, "$lt": current_utc_time},
             }
         },
         {"$group": {"_id": None, "user_count_last_7_days": {"$sum": "$Totaltrafic"}}},
@@ -77,10 +84,11 @@ def total_visit_last_7_days(collection):
     pipeline_previous_7_days = [
         {
             "$match": {
+                "SiteID": site_id,
                 "TimeStamp": {
                     "$gte": start_time_previous_7_days,
                     "$lt": start_time_last_7_days,
-                }
+                },
             }
         },
         {
@@ -113,7 +121,7 @@ def total_visit_last_7_days(collection):
     return json_response
 
 
-def total_male_female_kids_count_24h7d30d(collection):
+def total_male_female_kids_count_24h7d30d(collection, site_id):
     current_utc_time = datetime.utcnow()
     # Calculate the start time for the last 24 hours
     start_time_last_24_hours = current_utc_time - timedelta(hours=24)
@@ -122,7 +130,11 @@ def total_male_female_kids_count_24h7d30d(collection):
     pipeline_last_24_hours = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_24_hours, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {
+                    "$gte": start_time_last_24_hours,
+                    "$lt": current_utc_time,
+                },
             }
         },
         {
@@ -148,7 +160,8 @@ def total_male_female_kids_count_24h7d30d(collection):
     pipeline_last_7_days = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_days, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_7_days, "$lt": current_utc_time},
             }
         },
         {
@@ -174,7 +187,8 @@ def total_male_female_kids_count_24h7d30d(collection):
     pipeline_last_30_days = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time},
             }
         },
         {
@@ -201,13 +215,13 @@ def total_male_female_kids_count_24h7d30d(collection):
 
     # print("____________________-")
     result = {
-        "total_m_f_k_24h": result_last_24_hours[0]
-        if len(result_last_24_hours) > 0
-        else [],
+        "total_m_f_k_24h": (
+            result_last_24_hours[0] if len(result_last_24_hours) > 0 else []
+        ),
         "total_m_f_k_7d": result_last_7_days[0] if len(result_last_7_days) > 0 else [],
-        "total_m_f_k_30d": result_last_30_days[0]
-        if len(result_last_30_days) > 0
-        else [],
+        "total_m_f_k_30d": (
+            result_last_30_days[0] if len(result_last_30_days) > 0 else []
+        ),
     }
     print(result)
     return result
@@ -216,11 +230,16 @@ def total_male_female_kids_count_24h7d30d(collection):
 # * _______________________ API 2 ___________________________
 
 
-def hourly_visits_last_24h(collection):
+def hourly_visits_last_24h(collection, site_id):
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(hours=24)
     pipeline_hourly_visits = [
-        {"$match": {"TimeStamp": {"$gte": start_time, "$lt": end_time}}},
+        {
+            "$match": {
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time, "$lt": end_time},
+            }
+        },
         {
             "$group": {
                 "_id": {"hour": {"$hour": "$TimeStamp"}},
@@ -251,13 +270,13 @@ def hourly_visits_last_24h(collection):
     return json_response
 
 
-def calculate_daily_visits_for_last_7d(collection):
+def calculate_daily_visits_for_last_7d(collection, site_id):
     current_utc_time = datetime.utcnow()
 
     start_time_last_7_days = current_utc_time - timedelta(days=7)
 
     pipeline_daily_visits_last_7_days = [
-        {"$match": {"TimeStamp": {"$gte": start_time_last_7_days}}},
+        {"$match": {"SiteID": site_id, "TimeStamp": {"$gte": start_time_last_7_days}}},
         {
             "$group": {
                 "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$TimeStamp"}},
@@ -274,12 +293,12 @@ def calculate_daily_visits_for_last_7d(collection):
     return json_result
 
 
-def busiest_hour_7_days(collection):
+def busiest_hour_7_days(collection, site_id):
     start_time_last_7_days = datetime.utcnow() - timedelta(days=7)
 
     # Aggregation pipeline
     pipeline = [
-        {"$match": {"TimeStamp": {"$gte": start_time_last_7_days}}},
+        {"$match": {"SiteID": site_id, "TimeStamp": {"$gte": start_time_last_7_days}}},
         {
             "$addFields": {
                 "hour": {"$hour": {"date": "$TimeStamp", "timezone": "+00:00"}}
@@ -351,13 +370,14 @@ def busiest_hour_7_days(collection):
 # * _________________________________ API 3 ________________________________
 
 
-def gender_trend_30_days(collection):
+def gender_trend_30_days(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_30_days = current_utc_time - timedelta(days=30)
     pipeline_last_30_days = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_30_days, "$lt": current_utc_time},
             }
         },
         {
@@ -398,13 +418,14 @@ def gender_trend_30_days(collection):
     return json_response
 
 
-def gender_trend_last_7_weeks(collection):
+def gender_trend_last_7_weeks(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_7_weeks = current_utc_time - timedelta(weeks=7)
     pipeline_last_7_weeks_gender = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_weeks, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_7_weeks, "$lt": current_utc_time},
             }
         },
         {
@@ -451,17 +472,18 @@ def gender_trend_last_7_weeks(collection):
     return json_response
 
 
-def gender_trend_12_months(collection):
+def gender_trend_12_months(collection, site_id):
     current_utc_time = datetime.utcnow()
     # Calculate the start time for the last 12 months
     start_time_last_12_months = current_utc_time - timedelta(days=365)
     pipeline_last_12_months_gender = [
         {
             "$match": {
+                "SiteID": site_id,
                 "TimeStamp": {
                     "$gte": start_time_last_12_months,
                     "$lt": current_utc_time,
-                }
+                },
             }
         },
         {
@@ -513,16 +535,17 @@ def gender_trend_12_months(collection):
 # * ______________________________ API 4 ___________________________________
 
 
-def monthly_visitors_count(collection):
+def monthly_visitors_count(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_12_months = current_utc_time - timedelta(days=365)
     pipeline_last_12_months = [
         {
             "$match": {
+                "SiteID": site_id,
                 "TimeStamp": {
                     "$gte": start_time_last_12_months,
                     "$lt": current_utc_time,
-                }
+                },
             }
         },
         {
@@ -559,13 +582,14 @@ def monthly_visitors_count(collection):
     return json_response
 
 
-def gender_trend_last_7_hours(collection):
+def gender_trend_last_7_hours(collection, site_id):
     current_utc_time = datetime.utcnow()
     start_time_last_7_hours = current_utc_time - timedelta(hours=7)
     pipeline_last_7_hours = [
         {
             "$match": {
-                "TimeStamp": {"$gte": start_time_last_7_hours, "$lt": current_utc_time}
+                "SiteID": site_id,
+                "TimeStamp": {"$gte": start_time_last_7_hours, "$lt": current_utc_time},
             }
         },
         {

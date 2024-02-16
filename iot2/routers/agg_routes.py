@@ -19,7 +19,7 @@ def avg_gender_trends(response:Response , token:str = Depends(main.oauth2_scheme
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
 
     g_t_12m = agg_pipelines.monthly_visitors_count(main.cd)
@@ -39,7 +39,7 @@ def gender_trends(response:Response , token:str = Depends(main.oauth2_scheme)):
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
     
     g_30d = agg_pipelines.gender_trend_30_days(main.cd)
@@ -62,7 +62,7 @@ def busiest_hour(response:Response , token:str = Depends(main.oauth2_scheme)):
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
     busiest_hour = agg_pipelines.busiest_hour_7_days(main.cd)
     result = busiest_hour
@@ -88,12 +88,12 @@ def total_visits(response:Response , token:str = Depends(main.oauth2_scheme)):
     if isinstance(result, HTTPException):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid credentials: Token Expired- Try Login again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token - Try Login again"
         )
     try:
-        t_24h = agg_pipelines.total_visit_last_24_hours(cd)
-        t_7d = agg_pipelines.total_visit_last_7_days(cd)
-        c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(cd)
+        t_24h = agg_pipelines.total_visit_last_24_hours(main.cd)
+        t_7d = agg_pipelines.total_visit_last_7_days(main.cd)
+        c_t = agg_pipelines.total_male_female_kids_count_24h7d30d(main.cd)
         t_24h.update(t_7d)
         t_24h.update(c_t)
 

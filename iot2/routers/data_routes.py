@@ -9,10 +9,10 @@ from fastapi import (
     Form,
 )
 from icecream import ic
+from message_literals.messages import ExceptionLiterals, SuccessLiterals
 import dbquery
 import schemas
 import main
-import oauth
 import base64
 from bson import Binary
 
@@ -30,14 +30,14 @@ def customer_order_time(data: schemas.OrderTime, response: Response):
             response.status_code = status.HTTP_403_FORBIDDEN
             return HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Node access is revoked due to pending payment",
+                detail= ExceptionLiterals.ACCESS_REVOKED,
             )
 
         if site_data:
             dbquery.add_customer_order_time(
                 cot=main.ccot, site_id=site_id, customer_order_time=order_time
             )
-            result = {"msg": "data added successfully"}
+            result = {"detail": SuccessLiterals.INSERT_SUCCESSFUL}
 
             return result
 
@@ -45,14 +45,14 @@ def customer_order_time(data: schemas.OrderTime, response: Response):
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Exception: site not found with given Id",
+                detail= ExceptionLiterals.ID_NOT_FOUND,
             )
 
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Exception: {ex}",
+            detail= str(ex),
         )
 
 
@@ -71,7 +71,7 @@ def queue_idol_time(
             response.status_code = status.HTTP_403_FORBIDDEN
             return HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Node access is revoked due to pending payment",
+                detail= ExceptionLiterals.ACCESS_REVOKED,
             )
 
         if site_data:
@@ -91,7 +91,7 @@ def queue_idol_time(
             )
 
             result = {
-                "msg": "data added successfully",
+                "detail": SuccessLiterals.INSERT_SUCCESSFUL,
             }
 
             return result
@@ -100,14 +100,14 @@ def queue_idol_time(
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Exception: site not found with given Id",
+                detail= ExceptionLiterals.ID_NOT_FOUND,
             )
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         print(ex)
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Exception: {ex}",
+            detail=str(ex),
         )
 
 
@@ -124,7 +124,7 @@ def queue_serving_time(
             response.status_code = status.HTTP_403_FORBIDDEN
             return HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Node access is revoked due to pending payment",
+                detail= ExceptionLiterals.ACCESS_REVOKED,
             )
 
         if site_data:
@@ -138,19 +138,19 @@ def queue_serving_time(
                 total_individuals=total_individuals,
             )
 
-            return {"msg": "data added successfully"}
+            return {"detail": SuccessLiterals.INSERT_SUCCESSFUL}
 
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Exception: site not found with given Id",
+                detail= ExceptionLiterals.ID_NOT_FOUND,
             )
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Exception: {ex}",
+            detail= str(ex),
         )
 
 
@@ -170,7 +170,7 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
             response.status_code = status.HTTP_403_FORBIDDEN
             return HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Node access is revoked due to pending payment",
+                detail= ExceptionLiterals.ACCESS_REVOKED,
             )
 
         if site_data:
@@ -183,18 +183,18 @@ def add_traffic_info(data: schemas.TrafficInfo, response: Response):
                 total_female,
                 total_kids,
             )
-            result = {"msg": "data added successfully"}
+            result = {"detail": SuccessLiterals.INSERT_SUCCESSFUL}
             return result
         else:
             response.status_code = status.HTTP_404_NOT_FOUND
             return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Exception: site not found with given Id",
+                detail= ExceptionLiterals.ID_NOT_FOUND,
             )
 
     except Exception as ex:
         print(ex)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Exception: {ex}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail= str(ex)
         )

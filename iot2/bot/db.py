@@ -4,7 +4,7 @@ from decouple import config
 
 def create_db(client):
     try:
-        database_name = "TestDBMorrowAI"
+        database_name = config("DB_NAME")
 
         # Create or access the specified database
         existing_db = client[database_name]
@@ -13,7 +13,7 @@ def create_db(client):
         collection_super_admin = existing_db["superAdmin"]
         collection_admin = existing_db["admin"]
         collection_sites = existing_db["sites"]
-        collection_data = existing_db["data"]
+        collection_data = existing_db["Data"]
         collection_queue_serving_time = existing_db["queueServingTime"]
         collection_counter_idol_time = existing_db["counterIdolTime"]
         collection_customer_order_time = existing_db["customerOrderTime"]

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def add_data(
     cd,
     site_id,
@@ -18,16 +19,17 @@ def add_data(
             "TotalMale": total_male,
             "TotalFemale": total_female,
             "TotalKids": total_kids,
-            "bot": True
+            "bot": True,
         }
     )
+
 
 def delete_bot_records(collection):
 
     # Define the filter/query to find records where 'bot' is True
-    filter_query = {'bot': True}
+    filter_query = {"bot": True}
 
     # Delete all records matching the filter
     result = collection.delete_many(filter_query)
 
-    return result.deleted_count  
+    return result.deleted_count

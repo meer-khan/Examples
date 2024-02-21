@@ -28,11 +28,11 @@ def insert_data():
     for i in range (10000): 
         time.sleep(3)
         total_traffic , total_male, total_female, total_kids = generate_traffic(0, 10)
-        ic(total_traffic)
-        ic(total_male)
-        ic(total_female)
-        ic(total_kids)
-        ic("*******************")
+        # ic(total_traffic)
+        # ic(total_male)
+        # ic(total_female)
+        # ic(total_kids)
+        # ic("*******************")
         dbquery.add_data( cd,
                         site_id="65bbf817b9834d683b160224",
                         no_of_people= random_generator(0,10), 

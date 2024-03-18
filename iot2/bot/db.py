@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from icecream import ic
 from decouple import config
+from dbquery import delete_bot_records
 
 def create_db(client):
     try:
@@ -39,3 +40,10 @@ def main():
     # ca.create_index("email", unique= True)
 
     return csa, ca, cs, cd, cqst, ccit, ccot
+
+
+
+if __name__  == "__main__": 
+    csa, ca, cs, cd, cqst, ccit, ccot  = main()
+    results = delete_bot_records(cd)
+    ic(results)

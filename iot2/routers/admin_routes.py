@@ -65,44 +65,6 @@ def admin_registration(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
         )
 
-
-@router.post("/login", status_code=status.HTTP_200_OK)
-async def admin_login(data: schemas.Login, response: Response):
-
-    try:
-
-        admin = dbquery.admin_login(main.ca, email=data.email)
-
-        if not admin:
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
-            )
-
-        hashed_password = admin.get("password")
-        pass_verify = utils.verify(data.password, hashed_password)
-
-        if not pass_verify:
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
-            )
-
-        access_token = oauth.create_access_token(
-            {"email": admin.get("email"), "id": str(admin.get("_id"))}
-        )
-
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-        }
-    except Exception as ex:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
-        )
-
-
 @router.get(
     "/profile",
     status_code=status.HTTP_200_OK,
@@ -138,7 +100,7 @@ async def admin_profile(response: Response, token: str = Depends(main.oauth2_sch
             )
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
         )
 
@@ -176,6 +138,50 @@ async def admin_profile_site_by_id(
     
     except Exception as ex:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
         )
+
+
+
+
+# REMOVED ROUTE
+
+
+
+# @router.post("/login", status_code=status.HTTP_200_OK)
+# async def admin_login(data: schemas.Login, response: Response):
+
+#     try:
+
+#         admin = dbquery.admin_login(main.ca, email=data.email)
+
+#         if not admin:
+#             response.status_code = status.HTTP_401_UNAUTHORIZED
+#             return HTTPException(
+#                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+#             )
+
+#         hashed_password = admin.get("password")
+#         pass_verify = utils.verify(data.password, hashed_password)
+
+#         if not pass_verify:
+#             response.status_code = status.HTTP_401_UNAUTHORIZED
+#             return HTTPException(
+#                 status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+#             )
+
+#         access_token = oauth.create_access_token(
+#             {"email": admin.get("email"), "id": str(admin.get("_id"))}
+#         )
+
+#         return {
+#             "access_token": access_token,
+#             "token_type": "bearer",
+#         }
+#     except Exception as ex:
+#         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+#         return HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex)
+#         )
+

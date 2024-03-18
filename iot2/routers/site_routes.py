@@ -76,42 +76,13 @@ async def signup(data: schemas.SiteRegistration, response: Response, token:str =
         )
 
 
-@router.post("/site/login", status_code=status.HTTP_200_OK)
-async def site_login(data: schemas.Login, response: Response):
-
-    site = dbquery.site_login(main.cs, email=data.email)
-
-    if not site:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
-        )
-
-    hashed_password = site.get("password")
-    result = utils.verify(data.password, hashed_password)
-    if not result:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
-        )
-
-    access_token = oauth.create_access_token(
-        {"email": site.get("email"), "id": str(site.get("_id"))}
-    )
-
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-    }
-    
-
 @router.get(
     "/site/profile", status_code=status.HTTP_200_OK, response_model=schemas.SiteProfile
 )
 async def site_profile(response: Response, token:str =  Depends(main.oauth2_scheme)):
 
     result = oauth.get_current_user(token=token)
-
+    ic(result)
     if isinstance(result , HTTPException):
 
         response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -121,14 +92,14 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
         )
 
     site_data: dict = dbquery.get_site(main.cs, site_id=result.id)
-    profile_show_check = site_data.get("show_data")
-
     if not site_data:
         response.status_code = status.HTTP_404_NOT_FOUND
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail= ExceptionLiterals.INVALID_TOKEN,
         )
+    
+    profile_show_check = site_data.get("show_data")
     
     if not profile_show_check:
         response.status_code = status.HTTP_404_NOT_FOUND
@@ -142,3 +113,37 @@ async def site_profile(response: Response, token:str =  Depends(main.oauth2_sche
 
 
 # TODO: add _id in site profile as well
+
+
+
+
+# REMOVED ROUTE
+
+# @router.post("/site/login", status_code=status.HTTP_200_OK)
+# async def site_login(data: schemas.Login, response: Response):
+
+#     site = dbquery.site_login(main.cs, email=data.email)
+
+#     if not site:
+#         response.status_code = status.HTTP_401_UNAUTHORIZED
+#         return HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+#         )
+
+#     hashed_password = site.get("password")
+#     result = utils.verify(data.password, hashed_password)
+#     if not result:
+#         response.status_code = status.HTTP_401_UNAUTHORIZED
+#         return HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED, detail= ExceptionLiterals.INVALID_CREDENTIALS
+#         )
+
+#     access_token = oauth.create_access_token(
+#         {"email": site.get("email"), "id": str(site.get("_id"))}
+#     )
+
+#     return {
+#         "access_token": access_token,
+#         "token_type": "bearer",
+#     }
+    

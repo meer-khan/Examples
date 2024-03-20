@@ -7,11 +7,12 @@ users = {
   "username": "user123",
   "password": "...", 
   "email": "user@example.com",
-  "roles": ["user", "editor"], 
+  "roles": ["user_ObjectId"], 
   "plan_id": ObjectId("..."),
+  "terms_conditions": bool,
   "created_at": datetime.now(),
   "updated_at": datetime.now(),
-  "active": True
+  "active": True # Open to discussion 
 }
 
 roles = {

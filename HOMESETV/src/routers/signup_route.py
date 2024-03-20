@@ -14,15 +14,13 @@ from db import db_query
 router = APIRouter(tags=["signup"], prefix="/user")
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED)
+@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=dict)
 async def signup(data: schemas.Signup, response: Response):
     data = data.model_dump()
     inserted_record = db_query.insert_records(collection=app.col_user, data=data)
     ic(inserted_record.acknowledged)
     ic(inserted_record.inserted_id)
-    return HTTPException(
-        status_code=status.HTTP_201_CREATED, detail="user registration successful"
-    )
+    return {"detail": "user registered successfully"}
 
 
 # @router.post("/registration", status_code=status.HTTP_201_CREATED)

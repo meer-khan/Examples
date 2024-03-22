@@ -17,6 +17,14 @@ class Signup(BaseModel):
     phoneNo: phone_numbers
     termsConditions: bool
 
+
+    @field_validator("termsConditions",mode="after")
+    @classmethod
+    def check_termsConditions(cls, v:bool): 
+        if v is not True: 
+            raise ValueError("terms and conditions should be acknowledged")
+        return v
+    
     @model_validator(mode='after')
     def check_passwords_match(self):
         pw1 = self.password1

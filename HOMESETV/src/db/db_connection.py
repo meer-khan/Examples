@@ -62,4 +62,7 @@ def db_creation():
     admin, user = find_role(col_roles)
     if (admin and user) is None:
         add_roles(collection=col_roles)
+
+    col_user.create_index("email", unique= True)
+    col_roles.create_index("role", unique= True)
     return col_user, col_roles, col_plans

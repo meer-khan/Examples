@@ -1,38 +1,85 @@
-from fastapi import status, APIRouter, Response, HTTPException
+from fastapi import status, APIRouter, Response, HTTPException, Form
 from icecream import ic
+from pydantic import ValidationError
 from pymongo import errors
-import sys
-import pathlib
-
-BASE_DIR = pathlib.Path(__file__).resolve().parent.parent.parent
-# print(BASE_DIR)
-sys.path.append(str(BASE_DIR))
-ic(sys.path)
 from schemas import schemas
 import app
 from db import db_query
+import sys
+
+# ic(sys.path)
+from utils import password_manager
 
 router = APIRouter(tags=["signup"], prefix="/user")
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=dict)
-async def signup(data: schemas.Signup, response: Response):
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
+async def signup(
+    response: Response,
+    firstName: str = Form(...),
+    lastName: str = Form(...),
+    email: str = Form(...),
+    password1: str = Form(...),
+    password2: str = Form(...),
+    phoneNo: str = Form(...),
+    termsConditions: bool = Form(...),
+):
     try:
-        user_data = data.model_dump()
-        inserted_record = db_query.insert_records(collection=app.col_user, data=user_data)
+        user_data = {
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "password1": password1,
+            "password2": password2,
+            "phoneNo": phoneNo,
+            "termsConditions": termsConditions,
+        }
+        ic(user_data)
+        try:
+            user_data = schemas.Signup(
+                
+                    firstName= firstName,
+                    lastName= lastName,
+                    email=  email,
+                    password1= password1,
+                    password2=  password2,
+                    phoneNo = phoneNo,
+                    termsConditions = termsConditions,
+                
+            )
+        except ValidationError as exc_info:
+            ic(exc_info)
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=exc_info.errors())
+
+        user_data = user_data.model_dump()
+        user_data["password"] = password_manager.hash(user_data["password1"])
+        user_data.pop("password1")
+        user_data.pop("password2")
+        user_data.update({"roles": ["user"], "plan": None})
+        ic(user_data)
+        inserted_record = db_query.insert_records(
+            collection=app.col_user, data=user_data
+        )
         # TODO: Log - I
         return {"detail": "user registered successfully"}
 
-    except errors.DuplicateKeyError:
-        # TODO: Log - W
+    except errors.DuplicateKeyError as ex:
+        # TODO: Log - W {ex}
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="user already exists with this email",
         )
 
-    except Exception: 
+    except Exception as ex:
         # TODO: Log - C
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="internal server error")
+        ic(ex)
+        ic(type(ex))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="internal server error",
+        )
+
 
 # @router.post("/registration", status_code=status.HTTP_201_CREATED)
 # def admin_registration(

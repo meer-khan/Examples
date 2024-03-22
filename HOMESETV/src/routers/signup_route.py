@@ -1,5 +1,6 @@
 from fastapi import status, APIRouter, Response, HTTPException
 from icecream import ic
+from pymongo import errors
 import sys
 import pathlib
 
@@ -16,12 +17,22 @@ router = APIRouter(tags=["signup"], prefix="/user")
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=dict)
 async def signup(data: schemas.Signup, response: Response):
-    data = data.model_dump()
-    inserted_record = db_query.insert_records(collection=app.col_user, data=data)
-    ic(inserted_record.acknowledged)
-    ic(inserted_record.inserted_id)
-    return {"detail": "user registered successfully"}
+    try:
+        user_data = data.model_dump()
+        inserted_record = db_query.insert_records(collection=app.col_user, data=user_data)
+        # TODO: Log - I
+        return {"detail": "user registered successfully"}
 
+    except errors.DuplicateKeyError:
+        # TODO: Log - W
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="user already exists with this email",
+        )
+
+    except Exception: 
+        # TODO: Log - C
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="internal server error")
 
 # @router.post("/registration", status_code=status.HTTP_201_CREATED)
 # def admin_registration(

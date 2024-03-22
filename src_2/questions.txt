@@ -1,0 +1,79 @@
+ # * OUR STRING FOR PROMPT ENGINEERING
+        # ques = f'''Generate an email campaign calendar for {shop_categories} 
+        # with a focus on {content_concept_n_narrative} 
+        # around {seasionality}, 
+        # considering {key_e_commerce_dates} and {industry_specific_key_days}, targeted at {shop_locations}.'''
+
+
+# Please act like a strategist and implementor and generate relevant chatgpt prompt to get above results.
+# Please generate relevant chatgpt prompt to get above results.
+        # ques = '''
+        #     Please create and rephrase only Prompt for weekly calendar campaigns, next 3 months from now, for the 
+        #     shopify “sports and lifestyle clothing  with a focus Stay physically healtyh and active, around winter at  
+        #     4802 Rockwell Lane,  Rocky Mount, North Carolina”, consider yourself as strategist and implementor and also 
+        #     emphasize to generate data in tabular. I want you to return a table with campaign ideas, reasoning, 
+        #     targeted audiences, Prompt should be tailored according to seasonality, trends, shop category, what the shops products
+        #     are, key e-commerce days, 3 days a week at least.
+
+        #     '''
+
+        # ques = '''
+        #     Please create and rephrase only Prompt for weekly calendar campaigns, 
+        #     next 3 months from now, for the shopify sports and lifestyle clothing  with a focus Stay physically 
+        #     healtyh and active, around winter at  4802 Rockwell Lane,  Rocky Mount, North Carolina, 
+
+        #     consider yourself as strategist and implementor, Prompt should be tailored according to seasonality, 
+        #     trends, shop category, what the shops products are, key e-commerce days,
+        #     '''
+
+        # *: END CODE
+
+
+'''
+You are an email marketer for online [sneaker e-commerce store] , 
+can you suggest a list of email campaigns by looking at trends ,
+[holidays , sports and entertainment events , calendars] , what’s hot 
+topic on [social media]  in the recent [months] , hot topics in relevant industries and 
+consumer behaviors etc ? Please be creative and be relevant , targeting [young professionals , 
+university students , urban and rural populations]
+
+Generate an email campaign calendar for [sports] with a focus on [stay healthy 
+and physically healthy] around [summer], considering [summer holidays] and, targeted at [F10, 
+Islamabad Pakistan]
+'''
+# f'''
+# You are an email marketer for online {shop_categories} , 
+# can you suggest a list of email campaigns by looking at trends ,
+# {content_concept_n_narrative} , what’s hot 
+# topic on social media  in the recent {seasionality} , hot topics in relevant industries and 
+# consumer behaviors etc ? Please be creative and be relevant , targeting {shop_locations}
+
+# '''
+
+
+# PREVIOUS PARAMS
+'''
+
+{
+    "shop_categories": "sports", 
+    "ccn": "stay healthy and physically healthy",  //Content concept and narrative
+    "seasionality": "winter", 
+    //"ked": "winter holidays", //Key E-commerce Dates
+    //"iskd": "", //Industry-Specific Key Days
+    "shop_locations": "4802 Rockwell Lane,  Rocky Mount, North Carolina"
+}
+
+'''
+
+
+
+
+
+Please Generate weekly calendar campaigns, next 3 months from now, for the shopify store
+                {shop_categories} with a focus on {content_concept_n_narrative}
+                around {seasionality}, considering {key_e_commerce_dates} and {industry_specific_key_days},
+                targeted at {shop_locations}, 
+                consider yourself as strategist and implementor and also emphasize to generate data in tabular. 
+                I want you to return a table with campaign ideas, reasoning, targeted audiences, Prompt should be 
+                tailored according to seasonality, trends, shop category, what the shops products are, key e-commerce days, 
+                3 days a week at least. 

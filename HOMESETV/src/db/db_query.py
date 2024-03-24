@@ -11,8 +11,8 @@ def find_user(collection, data_field:str):
     record = collection.find_one({"email": data_field})
     return record
 
-def find_single_record(collection,  data:dict): 
-    record = collection.find_one(data)
+def find_single_record(collection,  data_dict:dict): 
+    record = collection.find_one(data_dict)
     return record
 
 def find_multiple_records(collection, data_dict)-> List: 

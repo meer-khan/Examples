@@ -11,7 +11,7 @@ oauth_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1440
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
 REFRESH_TOKEN_EXPIRE_DAYS = 7 
 
 def create_access_token(data:dict):
@@ -31,13 +31,13 @@ def verify_token(token:str, credentials_exception):
         id :str = payload.get("id")
 
         if email is None or id is None: 
-            return credentials_exception
-        token_data = schemas.TokenData(email=email, id= id)
+            raise credentials_exception
+        
 
     except JWTError: 
-        return credentials_exception
+        raise credentials_exception
     
-    return token_data
+    return email, id
 
 
 
@@ -56,13 +56,13 @@ def verify_refresh_token(token:str):
         id :str = payload.get("id")
 
         if id is None: 
-            return HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, 
                 detail = "Unauthorized user",
                 headers={"WWW.Authenticate": "Bearer"})
 
     except JWTError: 
-        return HTTPException(
+        raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, 
         detail = "Unauthorized user",
         headers={"WWW.Authenticate": "Bearer"})

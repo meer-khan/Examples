@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr, StringConstraints, field_validator, model_validator, Field, field_serializer
 from pydantic_extra_types import phone_numbers
 from typing_extensions import Annotated, Dict, Any, List
+from bson import ObjectId
+
 
 class Login(BaseModel):
     email: EmailStr
@@ -9,12 +11,10 @@ class Login(BaseModel):
 
 class Signup(BaseModel):
     model_config = {"arbitrary_types_allowed":True}
-    firstName : Annotated[str, StringConstraints(strip_whitespace=False, max_length=25, min_length=2)]
-    lastName : Annotated[str, StringConstraints(strip_whitespace=False, max_length=25, min_length=2 )]
+    userName : Annotated[str, StringConstraints(strip_whitespace=False, max_length=100, min_length=2)]
     email: EmailStr
     password1: Annotated[str, StringConstraints(strip_whitespace=False, min_length=8 )]
     password2: Annotated[str, StringConstraints(strip_whitespace=False, min_length=8 )]
-    phoneNo: phone_numbers
     termsConditions: bool
 
 
@@ -34,22 +34,14 @@ class Signup(BaseModel):
         return self
 
 class ProfileRET(BaseModel): 
-    id: str = Field(alias="_id")
+    model_config = {"arbitrary_types_allowed": True}
+    id:  ObjectId = Field(alias="_id", exclude=True)
     email: EmailStr
-    firstName: str
-    lastName: str
-    phoneNo: str
+    userName:str
     roles: List[str]
     plan: None | str
 
+    @field_serializer('id', return_type=str)
+    def serialize_courses_in_order(id: ObjectId):
+        return str(id)
     
-
-    # '_id': ObjectId('65fdf3e0ebbe8495813aa115'),
-    #          'email': 'shahmirkhan520@gmail.com',
-    #          'firstName': 'Shahmeer Khan',
-    #          'lastName': 'Khan',
-    #          'password': '$2b$12$Uf8tXw2PhCV2rcpglq4Wru7PDPQB616eUrWVSRjHAA0pZgYQiqPeK',
-    #          'phoneNo': '0985',
-    #          'plan': None,
-    #          'roles': ['user'],
-    #          'termsConditions': True

@@ -10,40 +10,34 @@ import sys
 # ic(sys.path)
 from utils import password_manager
 
-router = APIRouter(tags=["signup"], prefix="/user")
+router = APIRouter(tags=["user-management"], prefix="/user")
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def signup(
     response: Response,
-    firstName: str = Form(...),
-    lastName: str = Form(...),
+    userName: str = Form(...),
     email: str = Form(...),
     password1: str = Form(...),
     password2: str = Form(...),
-    phoneNo: str = Form(...),
     termsConditions: bool = Form(...),
 ):
     try:
         user_data = {
-            "firstName": firstName,
-            "lastName": lastName,
+            "userName": userName,
             "email": email,
             "password1": password1,
             "password2": password2,
-            "phoneNo": phoneNo,
             "termsConditions": termsConditions,
         }
         ic(user_data)
         try:
             user_data = schemas.Signup(
                 
-                    firstName= firstName,
-                    lastName= lastName,
+                    userName = userName,
                     email=  email,
                     password1= password1,
                     password2=  password2,
-                    phoneNo = phoneNo,
                     termsConditions = termsConditions,
                 
             )

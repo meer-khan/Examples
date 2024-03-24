@@ -5,7 +5,9 @@ from db import db_query
 import app
 from bson import ObjectId
 from schemas import schemas
-router = APIRouter(tags=["profile"])
+
+
+router = APIRouter(tags=["user-management"])
 
 @router.post("/profile", status_code=status.HTTP_200_OK, response_model=schemas.ProfileRET)
 async def profile(response: Response, user_data = Depends(oauth.get_current_user)):

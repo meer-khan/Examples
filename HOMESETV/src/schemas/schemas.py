@@ -45,3 +45,7 @@ class ProfileRET(BaseModel):
     def serialize_courses_in_order(id: ObjectId):
         return str(id)
     
+class Password(BaseModel): 
+    currentPassword: str
+    newPassword: str
+    

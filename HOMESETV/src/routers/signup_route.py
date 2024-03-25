@@ -2,12 +2,12 @@ from fastapi import status, APIRouter, Response, HTTPException, Form
 from icecream import ic
 from pydantic import ValidationError
 from pymongo import errors
+import datetime
 from schemas import schemas
 import app
 from db import db_query
 import sys
 
-# ic(sys.path)
 from utils import password_manager
 
 router = APIRouter(tags=["user-management"], prefix="/user")
@@ -38,6 +38,7 @@ async def signup(
                 password1=password1,
                 password2=password2,
                 termsConditions=termsConditions,
+                
             )
         except ValidationError as exc_info:
             ic(exc_info)
@@ -50,8 +51,15 @@ async def signup(
         user_data["password"] = password_manager.hash(user_data["password1"])
         user_data.pop("password1")
         user_data.pop("password2")
-        user_data.update({"roles": ["user"], "plan": None})
-        ic(user_data)
+        user_data.update(
+            {
+                "roles": ["user"],
+                "plan": None,
+                "createdAt": datetime.datetime.now(datetime.UTC),
+                "updatedAt": datetime.datetime.now(datetime.UTC),
+                "active": True
+            }
+        )
         inserted_record = db_query.insert_records(
             collection=app.col_user, data=user_data
         )

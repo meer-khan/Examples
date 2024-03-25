@@ -1,7 +1,8 @@
 from pymongo import MongoClient, errors
 from decouple import config
-from datetime import datetime
+import datetime
 from icecream import ic
+
 
 def create_db_connection(connection_string: str, db_name: str):
     """
@@ -25,9 +26,10 @@ def create_db_collections(collection_users, collection_roles, collections_plans,
         col_roles = db[collection_roles]
         col_plans = db[collections_plans]
         return col_user, col_roles, col_plans
-    
+
     except errors.CollectionInvalid as ex:
         raise ex
+
 
 def find_role(collection):
     admin = collection.find_one({"role": "admin"})
@@ -35,10 +37,24 @@ def find_role(collection):
     return admin, user
 
 
-def add_roles(collection): 
-    
-    collection.insert_one({"role": "user", "permissions": ["create", "read", "update", "delete"], "createdAt": datetime.now(), "updatedAt": datetime.now()})
-    collection.insert_one({"role": "admin", "permissions": ["create", "read", "update", "delete"], "createdAt": datetime.now(), "updatedAt": datetime.now()})
+def add_roles(collection):
+    collection.insert_one(
+        {
+            "role": "user",
+            "permissions": ["create", "read", "update", "delete"],
+            "createdAt": datetime.datetime.now(datetime.UTC),
+            "updatedAt": datetime.datetime.now(datetime.UTC),
+        }
+    )
+    collection.insert_one(
+        {
+            "role": "admin",
+            "permissions": ["create", "read", "update", "delete"],
+            "createdAt": datetime.datetime.now(datetime.UTC),
+            "updatedAt": datetime.datetime.now(datetime.UTC),
+        }
+    )
+
 
 def db_creation():
     """
@@ -63,6 +79,6 @@ def db_creation():
     if (admin and user) is None:
         add_roles(collection=col_roles)
 
-    col_user.create_index("email", unique= True)
-    col_roles.create_index("role", unique= True)
+    col_user.create_index("email", unique=True)
+    col_roles.create_index("role", unique=True)
     return col_user, col_roles, col_plans

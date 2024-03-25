@@ -9,9 +9,9 @@ users = {
   "email": "user@example.com",
   "roles": ["user_ObjectId"], 
   "plan_id": ObjectId("..."),
-  "terms_conditions": bool,
-  "created_at": datetime.now(),
-  "updated_at": datetime.now(),
+  "termsConditions": bool,
+  "createdAt": datetime.now(),
+  "updatedAt": datetime.now(),
   "active": True # Open to discussion 
 }
 
@@ -19,8 +19,8 @@ roles = {
   "_id": ObjectId("..."),
   "role": "user",
   "permissions": ["read"], 
-  "created_at": datetime.now(),
-  "updated_at": datetime.now()
+  "createdAt": datetime.now(),
+  "updatedAt": datetime.now()
 }
 
 
@@ -31,6 +31,6 @@ plans ={
   "price": 10.99, 
   "duration": 30, 
   "features": ["feature1", "feature2"], 
-  "created_at": datetime.now(),
-  "updated_at": datetime.now()
+  "createdAt": datetime.now(),
+  "updatedAt": datetime.now()
 }

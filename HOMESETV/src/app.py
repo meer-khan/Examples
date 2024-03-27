@@ -15,7 +15,7 @@ from routers import signup_route, login_route, profile_route, refresh_token_rout
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 app = FastAPI()
-col_user, col_roles, col_plan = db_creation()
+col_user, col_roles, col_plan, col_blacklist_token = db_creation()
 
 app.include_router(login_route.router)
 app.include_router(signup_route.router)

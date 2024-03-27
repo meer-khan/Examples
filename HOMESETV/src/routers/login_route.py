@@ -26,10 +26,10 @@ async def login( response: Response, user_credentials: OAuth2PasswordRequestForm
                 )
          else:
             access_token = oauth.create_access_token(
-                {"email": user.get("email"), "id": str(user.get("_id"))}
+                {"sub": str(user.get("_id")), "ver": user.get("passVer")}
             )
 
-            refresh_token = oauth.create_refresh_token({"id": str(user.get("_id"))})
+            refresh_token = oauth.create_refresh_token({"sub": str(user.get("_id")), "ver": user.get("passVer")})
 
             return {
                 "accessToken": access_token,

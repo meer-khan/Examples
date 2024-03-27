@@ -48,4 +48,7 @@ class ProfileRET(BaseModel):
 class Password(BaseModel): 
     currentPassword: str
     newPassword: str
+
+class DelAccount(BaseModel): 
+    password: str
     

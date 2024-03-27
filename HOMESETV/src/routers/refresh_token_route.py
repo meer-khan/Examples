@@ -12,13 +12,12 @@ router = APIRouter(tags=["user-management"], prefix="/user")
 
 
 @router.post("/refresh-token", status_code=status.HTTP_200_OK)
-async def refresh_token(response: Response, refreshToken:str = Depends(oauth.get_refresh_token)):
+async def refresh_token(response: Response, refreshToken:dict = Depends(oauth.get_refresh_token)):
     try:
         ic(refreshToken)
         # id = oauth.verify_refresh_token(refreshToken)
-        id = refreshToken
-        ic(id)
-        query_dict = {"_id": ObjectId(id)}
+        payload:dict = refreshToken
+        query_dict = {"_id": ObjectId(payload.get("sub")), "passVer": payload.get("ver")}
         user: dict = db_query.find_single_record(app.col_user, query_dict)
         ic(user)
         if not user:
@@ -29,7 +28,7 @@ async def refresh_token(response: Response, refreshToken:str = Depends(oauth.get
 
         else:
             access_token = oauth.create_access_token(
-                {"email": user.get("email"), "id": str(user.get("_id"))}
+                {"sub": str(user.get("_id")), "ver": user.get("passVer")}
             )
 
             return {

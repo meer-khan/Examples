@@ -57,7 +57,8 @@ async def signup(
                 "plan": None,
                 "createdAt": datetime.datetime.now(datetime.UTC),
                 "updatedAt": datetime.datetime.now(datetime.UTC),
-                "active": True
+                "active": True,
+                "passVer": 1
             }
         )
         inserted_record = db_query.insert_records(
